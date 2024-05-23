@@ -27,7 +27,7 @@ export const CLASES = [
     "web": "https://midu-react-04.surge.sh"
   },
   {
-    "id": "LcbVw99o8",
+    "id": "x-LcbVw99o8",
     "slug": "04-custom-hooks",
     "title": "Crea tus propios hooks en React + Testing E2E",
     "description": "Aprende a reutilizar código en tus componentes con los Custom Hooks y cómo usar Playwright para testear tus componentes",
