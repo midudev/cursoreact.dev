@@ -1,0 +1,33 @@
+---
+import ReactLogo from "./ReactLogo.astro"
+
+const { info } = Astro.props
+const { theme = {} } = info
+const { isDark = false } = theme
+---
+
+<div class="hidden sm:block px-8 py-1 rounded-lg">
+  <h1 class="font-bold mt-4 animate-fade-in-up">
+    <a
+      class="text-xs items-center flex gap-2 hover:scale-110 transition"
+      href="/"
+    >
+      <div class="flex flex-col text-center leading-none">
+        <span
+          class:list={[
+            "text-black tracking-tighter text-4xl px-1 inline-block",
+          ]}>Curso de</span
+        >
+        <span
+          class:list={[
+            "tracking-tighter text-[#58c4dc] text-[40px]",
+          ]}>React.js</span
+        >
+      </div>
+
+      <span>
+        <ReactLogo />
+      </span>
+    </a>
+  </h1>
+</div>
