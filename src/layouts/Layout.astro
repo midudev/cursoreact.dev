@@ -2,12 +2,13 @@
 import { ViewTransitions } from "astro:transitions"
 
 interface Props {
+  description: string
   title: string
 }
 
-const { title } = Astro.props
+const { title, description: originalDescription = "Con ejercicios practicos" } = Astro.props
 const description =
-  "Proyectos prácticos para aprender JavaScript con código fuente y vídeo. Totalmente gratis."
+  `Curso de React gratuito - ${originalDescription}`
 ---
 
 <!doctype html>
@@ -19,18 +20,18 @@ const description =
     <meta name="author" content="Miguel Ángel Durán" />
     <meta
       name="keywords"
-      content="javascript, js, programación, desarrollo web"
+      content="javascript, react, reactjs, midudev, js, programación, desarrollo web"
     />
     <meta name="theme-color" content="#f7df1e" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@midudev" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://javascript100.dev/og.jpg" />
+    <meta name="twitter:image" content="https://cursoreact.dev/og.jpg" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="https://javascript100.dev/og.jpg" />
-    <link rel="canonical" href="https://javascript100.dev" />
+    <meta property="og:image" content="https://cursoreact.dev/og.jpg" />
+    <link rel="canonical" href="https://cursoreact.dev" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <ViewTransitions />
