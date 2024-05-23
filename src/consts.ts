@@ -101,8 +101,8 @@ export const CLASES = [
   {
     "id": "WKfVjQUa6nE",
     "slug": "12-comments-react-query",
-    "title": "Sistema de comentarios con React Query",
-    "description": "Aprende a crear un sistema de comentarios con React Query",
+    "title": "React Query",
+    "description": "Aprende a usar React Query para hacer llamadas asíncronas y persistir los datos en tu aplicación",
     "code": "https://github.com/midudev/aprendiendo-react/blob/master/projects/12-comments-react-query",
     "learnings": ["React Query", "API"],
   },
