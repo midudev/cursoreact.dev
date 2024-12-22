@@ -114,5 +114,14 @@ export const CLASES = [
     "web": "https://midu-react-13.surge.sh",
     "description": "Usamos Zustand para crear una aplicación de quiz con React y TypeScript",
     "learnings": ["Zustand", "TypeScript"]
+  },
+  {
+    "id": "OG6YGMF0UPM",
+    "slug": "14-novedades-react-19",
+    "title": "Aprende las Novedades de React 19",
+    "code": "",
+    "web": "",
+    "description": "Creamos un taller desde cero para implementar las novedades de React 19.",
+    "learnings": ["Nuevos Hooks", "Actions", "API 'use'"]
   }
 ] as const 
