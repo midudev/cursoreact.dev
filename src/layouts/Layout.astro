@@ -14,8 +14,8 @@ const description = `Curso de React gratuito - ${originalDescription}`
 <!doctype html>
 <html lang="es">
   <head>
-    <title>{title}</title>
     <meta charset="UTF-8" />
+    <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content="Miguel Ángel Durán" />
     <meta
@@ -31,13 +31,22 @@ const description = `Curso de React gratuito - ${originalDescription}`
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content="https://cursoreact.dev/og.jpg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cursoreact.dev" />
     <link rel="canonical" href="https://cursoreact.dev" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <ClientRouter />
   </head>
   <body>
-    <slot />
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only bg-yellow-200 text-black p-2 absolute top-2 left-2 z-50 rounded"
+      >Saltar al contenido principal</a
+    >
+    <main id="main-content">
+      <slot />
+    </main>
     <style is:global>
       @import "tailwindcss";
       @plugin "@midudev/tailwind-animations";

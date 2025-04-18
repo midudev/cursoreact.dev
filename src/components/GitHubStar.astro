@@ -8,9 +8,7 @@ const data = await response.json()
 const starCounter = data.stargazers_count ?? 0
 
 function formatToK(num: number) {
-  return num >= 1000
-    ? (num / 1000).toFixed(1) + 'K'
-    : num.toString()
+  return num >= 1000 ? (num / 1000).toFixed(1) + "K" : num.toString()
 }
 ---
 

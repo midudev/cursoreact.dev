@@ -166,7 +166,10 @@ const number = `${index + 1}`.padStart(2, "0")
                     "inline-flex items-center justify-center px-3 py-2 text-xs font-semibold text-center text-black bg-white transition rounded-lg hover:bg-sky-100/80 hover:scale-105 md:text-sm",
                   ]}
                 >
-                  <span class="opacity-30 inline-block mr-1">#{index + 1} - </span> {clase.title}
+                  <span class="opacity-30 inline-block mr-1">
+                    #{index + 1} -{" "}
+                  </span>{" "}
+                  {clase.title}
                 </a>
               </li>
             )
