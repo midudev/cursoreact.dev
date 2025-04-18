@@ -1,0 +1,826 @@
+# Clase 1: Introducción a React
+
+¡Bienvenido/a a la primera clase de nuestro curso de React! En esta sesión, sentaremos las bases para entender qué es React, por qué es tan popular y cómo empezar a crear nuestras primeras interfaces de usuario.
+
+## Introducción
+
+Comenzamos con una breve introducción al curso, los objetivos de esta primera clase y qué esperaremos lograr al final. Hablaremos sobre la importancia de JavaScript en el desarrollo web moderno y cómo las librerías como React han revolucionado la forma en que construimos aplicaciones.
+
+---
+
+## ¿Qué es React?
+
+React es una **librería de JavaScript** para construir **interfaces de usuario (UI)**. Es desarrollada y mantenida por Meta (anteriormente Facebook) y una comunidad masiva de desarrolladores.
+
+Puntos clave:
+
+*   **No es un framework completo:** Se enfoca solo en la capa de la vista (cómo se ve tu UI). Necesitarás otras librerías para enrutamiento, manejo de estado avanzado, etc., aunque React tiene un gran ecosistema para eso.
+*   **Declarativo:** Describe cómo debe verse la UI en cualquier estado, y React se encarga de actualizar eficientemente el DOM cuando los datos cambian. Esto contrasta con el enfoque imperativo, donde manualmente manipulas el DOM paso a paso.
+*   **Basado en componentes:** Construyes UIs con piezas pequeñas y reutilizables llamadas componentes.
+
+---
+
+## Aviso sobre la documentación
+
+La documentación oficial de React (en [react.dev](https://react.dev)) es tu mejor amiga. Es completa, está bien organizada y se actualiza constantemente. Acostúmbrate a consultarla a menudo. Existe una nueva versión de la documentación (beta) que es altamente recomendable por su enfoque en hooks y ejemplos modernos.
+
+---
+
+## ¿De dónde sale React?
+
+React fue creado en Facebook para resolver problemas de mantenimiento en sus grandes y complejas interfaces de usuario, especialmente en el flujo de noticias, donde los datos cambian constantemente. Fue liberado como código abierto en 2013. Su éxito llevó a su adopción masiva fuera de Meta.
+
+---
+
+## 7 razones para aprender React
+
+1.  **Alta demanda laboral:** Es una de las tecnologías más buscadas por los empleadores en desarrollo web frontend.
+2.  **Gran comunidad y ecosistema:** Existe muchísima ayuda online, librerías complementarias, herramientas y recursos.
+3.  **Componentes reutilizables:** Facilita la construcción de UIs complejas a partir de bloques simples y mantenibles.
+4.  **Rendimiento eficiente:** Utiliza un "Virtual DOM" para minimizar las costosas operaciones directas sobre el DOM del navegador.
+5.  **Flexibilidad:** Puedes usar React para construir SPAs (Single Page Applications), aplicaciones móviles (React Native), renderizado del lado del servidor (SSR), sitios estáticos, etc.
+6.  **Curva de aprendizaje razonable:** Empezar es relativamente sencillo, aunque dominarlo lleva tiempo y práctica.
+7.  **Es divertido y productivo:** Su enfoque declarativo y basado en componentes simplifica el desarrollo de UIs interactivas.
+
+---
+
+## ¿Por qué React? Creando un botón sin React
+
+Veamos un ejemplo de cómo sería crear una UI simple (un botón que actualiza un texto al hacer click) usando JavaScript puro y manipulación directa del DOM.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sin React</title>
+</head>
+<body>
+    <div id="root"></div>
+
+    <button id="myButton">Click me</button>
+    <p id="myText">Has clickeado 0 veces.</p>
+
+    <script>
+        const button = document.getElementById('myButton');
+        const text = document.getElementById('myText');
+        let count = 0; // Necesitamos gestionar el estado (el contador)
+
+        // Añadimos un "listener" para el evento de click
+        button.addEventListener('click', () => {
+            count++; // Actualizamos el estado
+            text.textContent = `Has clickeado ${count} veces.`; // Actualizamos la UI manualmente
+            console.log('Botón clickeado:', count);
+        });
+
+        // Imagina una UI más compleja con muchos elementos interactuando... se vuelve complicado!
+    </script>
+</body>
+</html>
+```
+
+Como puedes ver, incluso para algo simple, debemos:
+1. Obtener referencias a los elementos del DOM.
+2. Mantener el "estado" (la variable `count`).
+3. Añadir "listeners" a eventos.
+4. Actualizar *manualmente* el contenido de los elementos del DOM cuando el estado cambia.
+
+En aplicaciones grandes, esto se vuelve muy difícil de manejar y depurar.
+
+---
+
+## Cómo usar React sin dependencias (con CDN)
+
+Antes de usar herramientas de build modernas como Vite o Create React App, podemos probar React directamente en un archivo HTML simple usando scripts de CDN. Necesitaremos 3 scripts: React (la librería principal), ReactDOM (para interactuar con el DOM) y Babel (para entender JSX).
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mi Primer React (CDN)</title>
+    <!-- Scripts de React, ReactDOM y Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <!-- El contenedor donde React renderizará nuestra app -->
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Aquí escribiremos nuestro código React (usando JSX, por eso type="text/babel")
+    </script>
+</body>
+</html>
+```
+
+Dentro del script con `type="text/babel"`, tendremos acceso global a `React` y `ReactDOM`.
+
+---
+
+## Crea tu primer elemento
+
+En React, un **elemento** es una descripción ligera de un nodo del DOM o de un componente. Son objetos planos que le dicen a React lo que quieres renderizar.
+
+Sin JSX, crearías elementos usando `React.createElement()`:
+
+```javascript
+// Dentro del script type="text/babel" en tu HTML
+
+// Crear un elemento de párrafo
+const myElement = React.createElement(
+    'p',        // 1. Tipo de elemento (etiqueta HTML o componente)
+    null,       // 2. Props (atributos, eventos, etc. null por ahora)
+    '¡Hola, React!' // 3. Hijos (contenido dentro del elemento)
+);
+
+// Encontrar el contenedor en el DOM
+const container = document.getElementById('root');
+
+// Crear una raíz de React (React 18+)
+const root = ReactDOM.createRoot(container);
+
+// Renderizar el elemento en el contenedor
+root.render(myElement);
+
+// Verás en el DOM: <div id="root"><p>¡Hola, React!</p></div>
+```
+
+---
+
+## Elemento con atributos (Props)
+
+El segundo argumento de `React.createElement` es un objeto para las `props` (propiedades). Aquí defines atributos HTML estándar (como `href`, `src`, `className` en lugar de `class`) o propiedades personalizadas para tus componentes.
+
+```javascript
+// Dentro del script type="text/babel" en tu HTML
+
+const linkElement = React.createElement(
+    'a',
+    {
+        href: 'https://react.dev', // Atributo href
+        target: '_blank',       // Atributo target
+        className: 'my-link'    // Atributo class (se usa className en React/JSX)
+    },
+    'Visitar la documentación de React' // Contenido del enlace
+);
+
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(linkElement);
+
+// Verás en el DOM: <div id="root"><a href="https://react.dev" target="_blank" class="my-link">Visitar la documentación de React</a></div>
+```
+
+---
+
+## Fragment
+
+React elements solo pueden tener un único nodo raíz. Si quieres renderizar varios elementos hermanos (por ejemplo, dos párrafos) sin envolverlos en un `div` extra en el DOM final, usas un Fragment.
+
+Con `React.createElement`:
+
+```javascript
+// Dentro del script type="text/babel" en tu HTML
+
+const fragmentExample = React.createElement(
+    React.Fragment, // Usamos React.Fragment
+    null,
+    React.createElement('p', null, 'Primer párrafo'),
+    React.createElement('p', null, 'Segundo párrafo')
+);
+
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(fragmentExample);
+
+// Verás en el DOM: <div id="root"><p>Primer párrafo</p><p>Segundo párrafo</p></div> (¡sin un div extra!)
+```
+Con JSX (veremos en el siguiente punto), la sintaxis es `<></>`.
+
+---
+
+## JSX desde cero
+
+JSX (JavaScript XML) es una extensión de sintaxis para JavaScript que parece HTML. Es la forma preferida de escribir React porque hace que la estructura de la UI sea mucho más legible. Babel transpilará tu código JSX a llamadas `React.createElement`.
+
+Reglas clave de JSX:
+
+*   **Similar a HTML/XML:** Representa la estructura de la UI.
+*   **Requiere un único elemento raíz:** Al igual que `React.createElement`, si renderizas múltiples hermanos, necesitas un contenedor (`div`, `<>`, etc.).
+*   **Atributos en camelCase:** Atributos HTML como `class` se convierten en `className`, `for` en `htmlFor`.
+*   **Expresiones JavaScript con `{}`:** Puedes insertar variables, expresiones o llamadas a funciones dentro de JSX usando llaves.
+
+Ejemplos en JSX (equivalentes a los anteriores):
+
+```jsx
+// Dentro del script type="text/babel" en tu HTML
+
+// Elemento simple
+const myElementJSX = <p>¡Hola, React (con JSX)!</p>;
+
+// Elemento con atributos
+const linkElementJSX = <a href="https://react.dev" target="_blank" className="my-link-jsx">Visitar la documentación (JSX)</a>;
+
+// Fragment con sintaxis corta <> </>
+const fragmentExampleJSX = (
+  <>
+    <p>Primer párrafo (JSX)</p>
+    <p>Segundo párrafo (JSX)</p>
+  </>
+);
+
+// Usando expresiones JavaScript
+const name = 'Mundo';
+const greetingElement = <p>¡Hola, {name}!</p>; // Inserta el valor de la variable 'name'
+
+const sum = 5 + 3;
+const calculationElement = <p>5 + 3 es igual a {sum}.</p>; // Inserta el resultado de la expresión
+
+// Renderizar uno de ellos
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(fragmentExampleJSX); // O myElementJSX, linkElementJSX, etc.
+```
+
+A partir de ahora, usaremos JSX por ser el estándar.
+
+---
+
+## 44:00 - Crea tu primera aplicación con React
+
+Combinando lo aprendido, aquí tienes el archivo HTML completo para tu primera "mini-aplicación" React usando CDN y JSX:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mi Primera Aplicación React (CDN)</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Definimos un componente principal (más sobre esto después)
+        // Por ahora, es una función que devuelve JSX
+        function App() {
+            const title = "¡Mi primera app!"; // Puedes usar JS dentro de tu función/componente
+            return (
+                <div>
+                    <h1>{title}</h1>
+                    <p>¡Hola desde mi aplicación React!</p>
+                    <p>Esto está renderizado con React y JSX usando CDN.</p>
+                </div>
+            );
+        }
+
+        // Obtener el contenedor DOM
+        const container = document.getElementById('root');
+
+        // Crear una raíz de React
+        const root = ReactDOM.createRoot(container);
+
+        // Renderizar el componente App dentro de la raíz
+        root.render(<App />); // Usamos JSX para renderizar nuestro componente <App />
+    </script>
+</body>
+</html>
+```
+Guarda esto como `.html` y ábrelo en tu navegador. Verás el contenido generado por React.
+
+---
+
+## Crear componentes en React
+
+Los componentes son el corazón de React. Son funciones (o clases) que devuelven elementos de React (JSX). Permiten dividir la UI en piezas independientes y reutilizables.
+
+Hay dos tipos principales (históricamente): Componentes de Clase y Componentes Funcionales. En React moderno, los **Componentes Funcionales** con Hooks son el enfoque recomendado.
+
+```jsx
+// Dentro del script type="text/babel" en tu HTML
+
+// Un componente funcional simple
+function WelcomeMessage() {
+  return (
+    <h2>¡Bienvenido a mi sitio web!</h2>
+  );
+}
+
+// Otro componente
+function Greeting(props) { // Los componentes funcionales reciben 'props' como argumento
+  return (
+    <p>Hola, {props.name}!</p>
+  );
+}
+
+// El componente principal App usando los componentes
+function App() {
+  return (
+    <div>
+      <h1>Mi Aplicación con Componentes</h1>
+      <WelcomeMessage /> {/* Usamos el componente como si fuera una etiqueta HTML personalizada */}
+      <Greeting name="Usuario" /> {/* Le pasamos una 'prop' llamada 'name' */}
+      <Greeting name="Invitado" /> {/* Reutilizamos el componente con otra prop */}
+    </div>
+  );
+}
+
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(<App />);
+```
+
+**Nota:** Los nombres de los componentes en React **siempre deben empezar con letra mayúscula** (`WelcomeMessage`, `Greeting`, `App`). Así React los distingue de las etiquetas HTML nativas (`div`, `p`, `h1`).
+
+---
+
+## Tu primer proyecto práctico con React
+
+Con los componentes, ya puedes empezar a estructurar una UI simple. Un buen ejercicio práctico sería:
+
+1.  **Crear un componente `Header`** que muestre el título de la aplicación.
+2.  **Crear un componente `Footer`** con información de copyright.
+3.  **Crear un componente `ProductCard`** que muestre el nombre y precio de un producto.
+4.  **Crear un componente `ProductList`** que use varios `ProductCard`.
+5.  **Ensamblar** todo en el componente `App`.
+
+Por ahora, puedes seguir usando la configuración con CDN para mantenerlo simple, o empezar a considerar herramientas de build para una estructura de proyecto más robusta.
+
+---
+
+## Estilos en React
+
+Hay varias formas de aplicar estilos en React:
+
+1.  **CSS Clásico:** Archivos `.css` separados. Usas `className` en JSX.
+2.  **Estilos en Línea (Inline Styles):** Objetos JavaScript que se aplican directamente al elemento usando la prop `style`. Las propiedades CSS se escriben en camelCase.
+3.  **CSS Modules:** Archivos CSS con nombres de clase generados automáticamente para evitar conflictos.
+4.  **Librerías CSS-in-JS:** Como Styled Components o Emotion, que permiten escribir CSS directamente en tu código JavaScript/JSX.
+
+Ejemplo de Estilos en Línea y CSS Clásico (requiere configuración de build para archivos `.css`):
+
+```jsx
+// Dentro del script type="text/babel" o en un entorno de build
+
+// --- Estilos en Línea ---
+const myStyle = {
+  color: 'purple', // Propiedades en camelCase
+  fontSize: '20px',
+  border: '1px solid blue',
+  padding: '10px',
+  borderRadius: '5px'
+};
+
+function StyledParagraphInline() {
+  return (
+    <p style={myStyle}>Este párrafo tiene estilos en línea.</p>
+  );
+}
+
+// --- Estilos con className (requiere un archivo CSS linkeado y reglas definidas) ---
+// Supongamos que tienes un archivo styles.css:
+/*
+.styled-paragraph-class {
+  color: green;
+  font-weight: bold;
+}
+*/
+function StyledParagraphClass() {
+  // En un entorno CDN, necesitarías linkear un archivo style.css en tu HTML <head>
+  return (
+    <p className="styled-paragraph-class">Este párrafo usa una clase CSS.</p>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <StyledParagraphInline />
+      {/* <StyledParagraphClass /> {/* Esto funcionaría si linked un CSS y la clase existe */}
+    </div>
+  );
+}
+
+// ... renderizar App ...
+```
+Los estilos en línea son útiles para estilos dinámicos o componentes pequeños, pero para estilos globales o complejos, las clases CSS o CSS Modules son preferibles.
+
+---
+
+## Reutilización de componentes: Props
+
+Las **Props (Propiedades)** son la forma principal de pasar datos de un componente padre a un componente hijo. Son como los atributos que pasas a las etiquetas HTML.
+
+```jsx
+// Dentro del script type="text/babel" o en un entorno de build
+
+// Componente que espera props
+function UserGreeting(props) {
+  // Puedes acceder a las props a través del objeto 'props'
+  return (
+    <h2>Hola, {props.username}! ¡Qué gusto verte!</h2>
+  );
+}
+
+// Componente padre que usa UserGreeting y le pasa diferentes props
+function App() {
+  const loggedInUser = "Alicia";
+  const guestUser = "Invitado";
+
+  return (
+    <div>
+      <UserGreeting username={loggedInUser} /> {/* Pasando la variable loggedInUser como prop 'username' */}
+      <UserGreeting username={guestUser} />   {/* Pasando la variable guestUser como prop 'username' */}
+      <UserGreeting username="Bob" />       {/* Pasando un string literal como prop */}
+    </div>
+  );
+}
+
+// ... renderizar App ...
+```
+
+**Destructuración de Props:** Es común desestructurar el objeto `props` directamente en la firma de la función para mayor comodidad:
+
+```jsx
+// Versión con Destructuración
+function UserGreeting({ username }) { // Accede directamente a 'username'
+  return (
+    <h2>Hola, {username}! ¡Qué gusto verte!</h2>
+  );
+}
+
+// El uso en el padre es el mismo
+function App() {
+  const loggedInUser = "Alicia";
+  return (
+    <div>
+      <UserGreeting username={loggedInUser} />
+    </div>
+  );
+}
+// ... renderizar App ...
+```
+
+---
+
+## Estila contenedor para separaciones y no componentes
+
+Un patrón útil de estilo es evitar que un componente añada sus propios márgenes o posicionamiento que afecten al layout *externo*. En su lugar, aplica esos estilos al *contenedor* del componente cuando lo usas.
+
+Ejemplo (conceptual):
+
+```jsx
+// En lugar de que Card añada margin-bottom: 20px a su propio div raíz...
+// NO RECOMENDADO general
+/*
+function Card() {
+  return <div style={{ border: '1px solid black', marginBottom: '20px' }}>...</div>
+}
+*/
+
+// ...es mejor que el padre que usa Card añada ese margen al contenedor:
+function Card() {
+  return <div style={{ border: '1px solid black' }}>Este es un Card.</div>
+}
+
+function CardList() {
+  return (
+    <div>
+      {/* Aquí el padre aplica el estilo de separación */}
+      <div style={{ marginBottom: '20px' }}><Card /></div>
+      <div style={{ marginBottom: '20px' }}><Card /></div>
+      <div style={{ marginBottom: '20px' }}><Card /></div>
+    </div>
+  );
+}
+// ... renderizar CardList ...
+```
+Esto hace que el componente `Card` sea más flexible y reutilizable en diferentes contextos de layout.
+
+---
+
+## Pasando booleanos como props
+
+Puedes pasar valores booleanos (verdadero/falso) como props usando llaves `{}`.
+
+```jsx
+// Dentro del script type="text/babel" o en un entorno de build
+
+function WarningMessage({ show }) {
+  // Si show es false, no renderiza nada (o null)
+  if (!show) {
+    return null;
+  }
+
+  // Si show es true, renderiza el mensaje
+  return (
+    <p style={{ color: 'red', fontWeight: 'bold' }}>¡Esto es una advertencia!</p>
+  );
+}
+
+function App() {
+  const isLoggedIn = true; // O false
+
+  return (
+    <div>
+      <h1>Aplicación</h1>
+      {/* Pasamos el booleano como prop */}
+      <WarningMessage show={!isLoggedIn} /> {/* Mostrar advertencia si NO está logueado */}
+      { isLoggedIn && <p>Bienvenido/a!</p> } {/* Renderizado condicional usando && */}
+    </div>
+  );
+}
+
+// ... renderizar App ...
+```
+Para props booleanas que son `true`, puedes usar una sintaxis abreviada: `<MyComponent isEnabled />` es equivalente a `<MyComponent isEnabled={true} />`. Para `false`, siempre necesitas `{false}`.
+
+---
+
+## Pasando funciones como props
+
+Pasar funciones como props es fundamental para que los componentes hijos puedan comunicarse con sus padres (por ejemplo, para manejar eventos).
+
+```jsx
+// Dentro del script type="text/babel" o en un entorno de build
+
+// Componente Botón que recibe una función onClick
+function MyButton({ onClick, label }) {
+  return (
+    <button onClick={onClick}> {/* Cuando se hace click, llama a la función recibida */}
+      {label}
+    </button>
+  );
+}
+
+// Componente padre que usa MyButton y define la función a pasar
+function App() {
+  const handleButtonClick = () => {
+    alert('¡Botón clickeado desde el componente padre!');
+  };
+
+  return (
+    <div>
+      <MyButton onClick={handleButtonClick} label="Haz Click" /> {/* Pasamos la función como prop */}
+    </div>
+  );
+}
+
+// ... renderizar App ...
+```
+El hijo `MyButton` no sabe *qué* hace la función `handleButtonClick`, solo sabe que debe llamarla cuando ocurre el evento `click`. Esto mantiene al hijo desacoplado.
+
+---
+
+## Elementos como props
+
+Puedes pasar cualquier cosa como prop, incluyendo otros elementos de React (JSX).
+
+```jsx
+// Dentro del script type="text/babel" o en un entorno de build
+
+// Un componente "Layout" que recibe un elemento para el contenido
+function Card({ title, content }) {
+  return (
+    <div style={{ border: '1px solid #ccc', padding: '15px', margin: '10px' }}>
+      <h3>{title}</h3>
+      <hr />
+      <div>
+        {content} {/* Renderiza el elemento o JSX que se pasó como prop 'content' */}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  // Creamos algunos elementos/JSX para pasar
+  const paragraphContent = <p>Este es el contenido de un párrafo.</p>;
+  const listContent = (
+    <ul>
+      <li>Elemento 1</li>
+      <li>Elemento 2</li>
+    </ul>
+  );
+
+  return (
+    <div>
+      <Card title="Tarjeta con Párrafo" content={paragraphContent} /> {/* Pasamos JSX */}
+      <Card title="Tarjeta con Lista" content={listContent} />       {/* Pasamos otro JSX */}
+      <Card title="Tarjeta simple" content={<p>Solo texto simple.</p>} /> {/* Pasamos JSX inline */}
+    </div>
+  );
+}
+
+// ... renderizar App ...
+```
+
+---
+
+## Diferencia entre elemento y componente
+
+*   **Elemento:** Un objeto plano que *describe* lo que quieres renderizar. Es una "instancia" de lo que aparecerá en la UI. `<h1>Hola</h1>` es un elemento React.
+*   **Componente:** Una función o clase que *devuelve* elementos de React. Es un "plano" o "fábrica" para crear elementos. `function Greeting() { return <h1>Hola</h1>; }` es un componente.
+
+Renderizas elementos, que son el resultado de llamar a componentes. `root.render(<App />)` le dice a React: "ejecuta el componente `App`, obtén los elementos que devuelve, y renderízalos en el DOM".
+
+---
+
+## Las props son inmutables
+
+**¡Importante!** Dentro de un componente, las props que recibe **nunca deben ser modificadas**. Las props son de "solo lectura". Un componente debe comportarse como una función pura respecto a sus props: dada la misma entrada (props), siempre debe devolver la misma salida (elementos).
+
+Si un componente necesita que los datos cambien con el tiempo, debe usar **estado** (State), no modificar sus props.
+
+---
+
+## La prop especial `children`
+
+La prop `children` es una prop especial que contiene el contenido que se pasa **entre las etiquetas de apertura y cierre** de un componente.
+
+```jsx
+// Dentro del script type="text/babel" o en un entorno de build
+
+// Componente Layout que renderiza su prop children
+function PageLayout({ title, children }) {
+  return (
+    <div style={{ border: '2px dashed purple', padding: '20px' }}>
+      <h2>{title}</h2>
+      <hr />
+      {/* Aquí se renderiza el contenido que está DENTRO de las etiquetas <PageLayout> */}
+      {children}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      {/* Todo lo que está aquí dentro se convierte en la prop 'children' */}
+      <PageLayout title="Contenido de la Página">
+        <p>Este es el primer párrafo dentro del layout.</p>
+        <p>Este es el segundo párrafo.</p>
+        <button onClick={() => alert('¡Hola desde Children!')}>Botón dentro</button>
+      </PageLayout>
+
+      {/* Puedes usarlo sin children también */}
+      <PageLayout title="Layout vacío" />
+    </div>
+  );
+}
+
+// ... renderizar App ...
+```
+La prop `children` es muy útil para componentes contenedores como layouts, listas, modales, etc.
+
+---
+
+## Pasar objeto como props
+
+Puedes pasar objetos JavaScript directamente como props.
+
+```jsx
+// Dentro del script type="text/babel" o en un entorno de build
+
+// Componente que espera un objeto de usuario como prop
+function UserInfo({ user }) { // Destructuramos para obtener el objeto 'user'
+  return (
+    <div style={{ border: '1px solid green', padding: '10px', margin: '10px' }}>
+      <p>Nombre: {user.firstName} {user.lastName}</p>
+      <p>Edad: {user.age}</p>
+      <p>Email: {user.email}</p>
+    </div>
+  );
+}
+
+function App() {
+  // Creamos un objeto de usuario
+  const userData = {
+    firstName: 'Ana',
+    lastName: 'García',
+    age: 28,
+    email: 'ana.garcia@example.com'
+  };
+
+  return (
+    <div>
+      <h2>Lista de Usuarios</h2>
+      {/* Pasamos el objeto userData como la prop 'user' */}
+      <UserInfo user={userData} />
+
+      {/* También puedes pasar un objeto literal */}
+      <UserInfo user={{ firstName: 'Pedro', lastName: 'Martínez', age: 35, email: 'pedro@example.com' }} />
+    </div>
+  );
+}
+
+// ... renderizar App ...
+```
+
+También es posible "expandir" las propiedades de un objeto directamente como props separadas usando el operador `...` (spread syntax), aunque esto pasa *propiedades separadas*, no el objeto como una única prop:
+
+```jsx
+function UserInfoSpread({ firstName, lastName, age, email }) { // Espera props separadas
+    return (
+      <div style={{ border: '1px solid orange', padding: '10px', margin: '10px' }}>
+        <p>Nombre: {firstName} {lastName}</p>
+        <p>Edad: {age}</p>
+        <p>Email: {email}</p>
+      </div>
+    );
+}
+
+function App() {
+    const userData = { firstName: 'Ana', lastName: 'García', age: 28, email: 'ana.garcia@example.com' };
+    return (
+        <div>
+            {/* Expande las propiedades de userData como props separadas:
+               firstName={userData.firstName} lastName={userData.lastName} etc.
+            */}
+            <UserInfoSpread {...userData} />
+        </div>
+    );
+}
+// ... renderizar App ...
+```
+
+---
+
+## State en React
+
+Mientras que las props son datos que vienen *de fuera* y son inmutables para el componente, el **Estado (State)** son datos que *vive dentro* de un componente y **puede cambiar con el tiempo**, haciendo que el componente se vuelva a renderizar (actualice la UI).
+
+En componentes funcionales, gestionamos el estado usando **Hooks**, siendo `useState` el más común.
+
+```jsx
+// NOTA: Para usar Hooks (como useState), necesitarás un entorno de build
+// como Vite o Create React App, o una versión de Babel que soporte React Hooks.
+// El script type="text/babel" de CDN NO siempre soporta todas las características
+// modernas de React, incluyendo Hooks complejos.
+// Para este ejemplo, asume que estás en un entorno de build.
+
+import React, { useState } from 'react'; // Necesitas importar useState
+
+function Counter() {
+  // Declaramos una variable de estado 'count'
+  // useState(0) inicializa 'count' a 0
+  // setCount es la función que usaremos para ACTUALIZAR 'count'
+  const [count, setCount] = useState(0);
+
+  // Función para manejar el click del botón
+  const handleIncrement = () => {
+    // NUNCA modifiques 'count' directamente (count++).
+    // Siempre usa la función 'setCount' para actualizar el estado.
+    setCount(count + 1);
+    // Al llamar a setCount, React sabe que el estado ha cambiado
+    // y necesita volver a renderizar este componente.
+  };
+
+  return (
+    <div style={{ border: '1px solid blue', padding: '15px', margin: '10px' }}>
+      <p>Contador: {count}</p> {/* Mostramos el valor actual del estado */}
+      <button onClick={handleIncrement}>
+        Incrementar
+      </button>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <h1>Ejemplo de Estado</h1>
+      <Counter /> {/* Usamos el componente con estado */}
+      <Counter /> {/* Cada instancia de Counter tiene su PROPIO estado 'count' */}
+    </div>
+  );
+}
+
+// En un entorno de build (como Vite/CRA), el renderizado es diferente:
+// import ReactDOM from 'react-dom/client';
+// const container = document.getElementById('root');
+// const root = ReactDOM.createRoot(container);
+// root.render(<App />);
+
+// Para el ejemplo con CDN, tendrías que configurar Babel para soportar Hooks, lo cual es más complejo.
+// Pero conceptualmente, el código del componente Counter y App es correcto.
+```
+
+El Hook `useState` te da una variable de estado y una función para actualizarla. Cuando llamas a la función de actualización (`setCount`), React re-renderiza el componente, y la variable de estado (`count`) tendrá el nuevo valor.
+
+---
+
+## Próximos Pasos
+
+Con esto cubrimos las bases: qué es React, por qué usarlo, cómo crear elementos con JSX, construir componentes, pasar datos con props y la introducción al estado.
+
+En la próxima clase, probablemente nos enfocaremos en:
+
+*   Configurar un entorno de desarrollo moderno (Vite).
+*   Profundizar en el manejo del estado con `useState`.
+*   Manejo de eventos más a fondo.
+*   Listas y Keys.
+*   Renderizado condicional.
+
+¡Sigue practicando creando componentes simples y pasándoles diferentes props!
