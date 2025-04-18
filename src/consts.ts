@@ -105,6 +105,7 @@ export const CLASES = [
     "description": "Aprende a usar React Query para hacer llamadas asíncronas y persistir los datos en tu aplicación",
     "code": "https://github.com/midudev/aprendiendo-react/blob/master/projects/12-comments-react-query",
     "learnings": ["React Query", "API"],
+    "web": "https://midu-react-12.surge.sh"
   },
   {
     "id": "p2wF2wRjcN0",
@@ -113,7 +114,7 @@ export const CLASES = [
     "code": "https://github.com/midudev/aprendiendo-react/blob/master/projects/13-javascript-quiz-con-zustand",
     "web": "https://midu-react-13.surge.sh",
     "description": "Usamos Zustand para crear una aplicación de quiz con React y TypeScript",
-    "learnings": ["Zustand", "TypeScript"]
+    "learnings": ["Zustand", "TypeScript"],
   },
   {
     "id": "OG6YGMF0UPM",
