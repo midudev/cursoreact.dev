@@ -1,14 +1,14 @@
 ---
-import { ViewTransitions } from "astro:transitions"
+import { ClientRouter } from "astro:transitions"
 
 interface Props {
   description?: string
   title: string
 }
 
-const { title, description: originalDescription = "Con ejercicios practicos" } = Astro.props
-const description =
-  `Curso de React gratuito - ${originalDescription}`
+const { title, description: originalDescription = "Con ejercicios practicos" } =
+  Astro.props
+const description = `Curso de React gratuito - ${originalDescription}`
 ---
 
 <!doctype html>
@@ -34,11 +34,14 @@ const description =
     <link rel="canonical" href="https://cursoreact.dev" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <ViewTransitions />
+    <ClientRouter />
   </head>
   <body>
     <slot />
     <style is:global>
+      @import "tailwindcss";
+      @plugin "@midudev/tailwind-animations";
+
       html {
         font-family: system-ui, sans-serif;
       }
