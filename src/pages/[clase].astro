@@ -154,15 +154,10 @@ const number = `${index + 1}`.padStart(2, "0")
             // Renderiza el MDX si existe, si no, muestra la descripción
             (async () => {
               try {
-                console.log(info.slug)
                 const MdxModule = await import(`../clases/${info.slug}.mdx`)
                 const MdxContent = MdxModule.default
                 console.log(MdxContent)
-                return (
-                  <Prose>
-                    <MdxContent />
-                  </Prose>
-                )
+                return <MdxContent />
               } catch (e) {
                 console.error(e)
                 return info.description
