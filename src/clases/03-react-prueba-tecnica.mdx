@@ -1,11 +1,12 @@
-En esta clase, desglosaremos una prueba técnica común en React: construir una aplicación que muestre hechos sobre gatos y una imagen relacionada, utilizando buenas prácticas como hooks personalizados y manejo de estado.
 
-🔗 Repositorio con todo el código:
+🔗 Repositorio del código original:
 [https://github.com/midudev/aprendiendo-react/tree/master/projects/04-react-prueba-tecnica](https://github.com/midudev/aprendiendo-react/tree/master/projects/04-react-prueba-tecnica)
+
+---
 
 ## Enunciado de la Prueba Técnica
 
-Descripción de la tarea: Crear una aplicación React que al cargar muestre un hecho aleatorio sobre gatos y una imagen relacionada con el hecho. Debe haber un botón para obtener un nuevo hecho y su imagen correspondiente.
+Crear una aplicación React que al cargar muestre un hecho aleatorio sobre gatos y una imagen relacionada. Debe haber un botón para obtener un nuevo hecho y su imagen correspondiente.
 
 ---
 
@@ -19,6 +20,8 @@ npm create vite@latest cat-fact-app --template react
 cd cat-fact-app
 npm install
 ```
+
+---
 
 ## Punto de Entrada de Nuestra Aplicación
 
@@ -42,10 +45,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 ## JSX
 
-Repaso de la sintaxis JSX, utilizada para describir la estructura de la UI en React. Vemos cómo se usa en el componente `App`.
+Repaso de la sintaxis JSX, utilizada para describir la estructura de la UI en React. Veremos cómo se utiliza en el componente `App` para renderizar el contenido.
 
 ```jsx
-// Fragmento de src/App.jsx
+// Fragmento del return en src/App.jsx
 return (
   <main>
     <h1>App de gatitos</h1>
@@ -55,160 +58,137 @@ return (
   </main>
 )
 ```
-Aquí vemos cómo combinamos HTML-like syntax con lógica JavaScript (variables entre `{}` y renderizado condicional con `&&`).
+Aquí combinamos la estructura tipo HTML con expresiones y lógica de JavaScript dentro de las llaves `{}`.
 
 ---
 
 ## Instalación del Linter
 
-Importancia de configurar herramientas como ESLint y Prettier para mantener un código limpio, consistente y libre de errores comunes.
+La importancia de configurar herramientas como ESLint y Prettier se mantiene. Aseguran código limpio, consistente y ayudan a prevenir errores.
 
 ```bash
 # Ejemplo: Instalar dependencias para linter y formateador
 npm install --save-dev eslint prettier eslint-plugin-react eslint-config-prettier eslint-plugin-jsx-a11y eslint-plugin-import
 ```
-(Configuración específica puede variar, referirse al repositorio).
+(La configuración específica puede variar).
 
 ---
 
-## Creación de Componentes y Hooks Personalizados
+## Lógica del Componente Único (Sin Hooks Personalizados)
 
-En lugar de un único componente grande, separamos la lógica usando hooks personalizados (`useCatFact`, `useCatImage`) para manejar diferentes partes del estado y efectos secundarios. El componente `App` se encarga de la presentación.
+Enfoque principal de esta clase: En lugar de crear hooks personalizados (`useCatFact`, `useCatImage`), toda la lógica de manejo de estado, efectos secundarios (llamadas a API) y eventos se concentra en el componente principal `App`.
 
 ---
 
-## Creación y Manejo del Estado
+## Creación y Manejo del Estado en `App`
 
-Utilizamos el hook `useState` para gestionar el estado mutable dentro de nuestros hooks personalizados.
+Utilizaremos el hook `useState` directamente dentro del componente `App` para manejar el hecho del gato (`fact`) y la URL de la imagen (`imageUrl`).
 
-En `useCatFact.jsx`:
 ```jsx
 import { useState } from 'react';
+// ... dentro de la función App()
+const [fact, setFact] = useState(); // Estado para el hecho
+const [imageUrl, setImageUrl] = useState(); // Estado para la URL de la imagen
 // ...
-export function useCatFact () {
-  const [fact, setFact] = useState(); // Estado para almacenar el hecho
-  // ...
-  return { fact, refreshFact }
-}
 ```
-
-En `useCatImage.jsx`:
-```jsx
-import { useState } from 'react';
-// ...
-export function useCatImage ({ fact }) {
-  const [imageUrl, setImageUrl] = useState(); // Estado para almacenar la URL de la imagen
-  // ...
-  return { imageUrl: `${CAT_PREFIX_IMAGE_URL}${imageUrl}` }
-}
-```
-Cada hook gestiona su propio estado relevante.
 
 ---
 
-## Estrategia al Afrontar la Prueba y las APIs
+## Estrategia para Afrontar la Prueba y las APIs
 
-Cómo dividir la prueba:
+La estrategia conceptual sigue siendo la misma:
 1.  Obtener el hecho del gato.
 2.  Obtener la imagen basada en el hecho.
 3.  Mostrar ambos.
 4.  Implementar el botón para obtener un nuevo par hecho/imagen.
 
-Esto nos lleva a la idea de dos llamadas a API distintas y cómo coordinarlas. `useCatFact` maneja la primera llamada, y `useCatImage` maneja la segunda, dependiendo del resultado de la primera.
+La diferencia es que implementaremos estos pasos usando `useEffect` y funciones auxiliares *dentro* de `App.jsx`. Necesitaremos dos efectos distintos.
 
 ---
 
-## Hooks `useCatFact` y `useCatImage`
+## Implementando la Lógica con `useEffect` dentro de `App`
 
-Desglose de la lógica encapsulada en cada hook.
+Aquí es donde reside la mayor diferencia. Usaremos dos llamadas al hook `useEffect`:
+1.  Un `useEffect` para obtener el *primer* hecho aleatorio al montar el componente.
+2.  Otro `useEffect` para obtener la imagen *cada vez que el `fact` cambie*.
 
-### `useCatFact.jsx`
-
-Este hook se encarga de:
--   Mantener el estado del `fact`.
--   Tener una función `refreshFact` para obtener un nuevo hecho.
--   Utilizar `useEffect` para llamar a `refreshFact` *una vez* al montar el componente (para tener un hecho inicial).
-
-```jsx
-// src/hooks/useCatFact.js
-import { useState, useEffect } from 'react'
-import { getRandomFact } from '../services/facts.js' // Asumimos un servicio
-
-export function useCatFact () {
-  const [fact, setFact] = useState()
-
-  const refreshFact = () => {
-    getRandomFact().then(newFact => setFact(newFact))
-  }
-
-  // Efecto: Recuperar la cita al cargar la página (solo una vez)
-  useEffect(refreshFact, []) // Dependencia vacía: se ejecuta al montar
-
-  return { fact, refreshFact } // Exponemos el estado y la función para actualizar
-}
-```
-
-### `useCatImage.jsx`
-
-Este hook se encarga de:
--   Mantener el estado de la `imageUrl`.
--   Recibir el `fact` como entrada.
--   Utilizar `useEffect` para obtener la imagen *cada vez que el `fact` cambia*.
--   Construir la URL de la imagen usando parte del hecho y un prefijo base.
-
-```jsx
-// src/hooks/useCatImage.js
-import { useEffect, useState } from 'react'
-
-const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
-
-export function useCatImage ({ fact }) {
-  const [imageUrl, setImageUrl] = useState()
-
-  // Efecto: Recuperar la imagen cada vez que tenemos una cita nueva
-  useEffect(() => {
-    if (!fact) return // No hacemos nada si no hay fact todavía
-
-    // Extraer las primeras 3 palabras
-    const threeFirstWords = fact.split(' ', 3).join(' ')
-
-    // Construir y hacer la llamada a la API de imágenes
-    fetch(`https://cataas.com/cat/says/${threeFirstWords}?size=50&color=red&json=true`)
-      .then(res => res.json())
-      .then(response => {
-        const { _id } = response
-        // La API nos da un ID, construimos la URL final
-        const url = `/cat/${_id}/says/${threeFirstWords}`
-        setImageUrl(url) // Actualizamos el estado de la imagen
-      })
-  }, [fact]) // Dependencia: este efecto se re-ejecuta cuando 'fact' cambia
-
-  return { imageUrl: `${CAT_PREFIX_IMAGE_URL}${imageUrl}` } // Exponemos la URL completa
-}
-```
-
----
-
-## El Componente `App`
-
-Este componente orquesta el uso de los hooks y maneja la interacción del usuario.
+Vamos a poner toda la lógica en `App.jsx`.
 
 ```jsx
 // src/App.jsx
-import './App.css'
-import { useCatImage } from './hooks/useCatImage.js'
-import { useCatFact } from './hooks/useCatFact.js'
+import { useState, useEffect } from 'react';
+import './App.css';
+
+const CAT_FACT_API_URL = 'https://catfact.ninja/fact';
+const CAT_IMAGE_API_BASE_URL = 'https://cataas.com';
 
 export function App () {
-  // Usamos los hooks
-  const { fact, refreshFact } = useCatFact()
-  const { imageUrl } = useCatImage({ fact }) // useCatImage depende de fact
+  // Estados para el hecho y la URL de la imagen
+  const [fact, setFact] = useState();
+  const [imageUrl, setImageUrl] = useState();
 
-  // Manejador del click del botón
-  const handleClick = async () => {
-    refreshFact() // Al hacer click, solo necesitamos obtener un nuevo fact
-    // useCatImage automáticamente reaccionará al cambio de fact gracias a su useEffect
-  }
+  // Función auxiliar para obtener un hecho aleatorio
+  const fetchRandomFact = () => {
+     fetch(CAT_FACT_API_URL)
+       .then(res => {
+          // Manejo básico de errores
+          if (!res.ok) throw new Error('Error fetching fact');
+          return res.json();
+       })
+       .then(data => {
+         setFact(data.fact); // Actualiza el estado del hecho
+       })
+       .catch(err => {
+          console.error('Error fetching cat fact:', err);
+          // Podríamos setFact(null) o mostrar un mensaje de error en UI
+       });
+  };
+
+  // --- EFECTO 1: Obtener hecho inicial ---
+  // Este efecto se ejecuta solo una vez: al montar el componente
+  useEffect(() => {
+    fetchRandomFact();
+  }, []); // Array de dependencias vacío: se ejecuta solo al montar y desmontar
+
+  // --- EFECTO 2: Obtener imagen cuando el hecho cambia ---
+  // Este efecto se ejecuta cada vez que el valor de 'fact' cambia
+  useEffect(() => {
+    // No hacemos nada si fact es nulo o indefinido (estado inicial o error)
+    if (!fact) {
+        setImageUrl(null); // Opcional: limpia la imagen si no hay hecho
+        return;
+    }
+
+    // Extraer las primeras 3 palabras del hecho
+    const threeFirstWords = fact.split(' ', 3).join(' ');
+    // console.log('Obteniendo imagen para:', threeFirstWords); // Útil para depurar en entrevista
+
+    // Llamada a la API de imágenes de gatos
+    fetch(`${CAT_IMAGE_API_BASE_URL}/cat/says/${threeFirstWords}?size=50&color=red&json=true`)
+      .then(res => {
+         // Manejo básico de errores
+         if (!res.ok) throw new Error('Error fetching cat image');
+         return res.json()
+       })
+      .then(response => {
+        const { _id } = response; // La API devuelve un ID para la imagen
+        // Construir la URL completa de la imagen
+        const url = `${CAT_IMAGE_API_BASE_URL}/cat/${_id}/says/${threeFirstWords}`;
+        setImageUrl(url); // Actualizar el estado de la URL de la imagen
+      })
+      .catch(err => {
+         console.error('Error fetching cat image:', err);
+         setImageUrl(null); // Opcional: limpia la imagen o muestra error
+      });
+
+  }, [fact]); // Array de dependencias: se re-ejecuta cuando 'fact' cambia
+
+  // Manejador del evento click del botón
+  const handleClick = () => {
+    fetchRandomFact(); // Al hacer click, solo necesitamos obtener un nuevo hecho
+    // El Efecto 2 (con dependencia [fact]) se encargará automáticamente de
+    // obtener la imagen correspondiente al nuevo hecho.
+  };
 
   return (
     <main>
@@ -216,23 +196,41 @@ export function App () {
 
       <button onClick={handleClick}>Get new fact</button>
 
-      {/* Mostramos fact y imagen solo si están disponibles */}
+      {/* Renderizado condicional: mostrar fact y imagen solo si existen */}
       {fact && <p>{fact}</p>}
-      {imageUrl && <img src={imageUrl} alt={`Image extracted using the first three words for ${fact}`} />}
+      {/* La URL de la imagen ya está completa en el estado imageUrl */}
+      {imageUrl && <img src={imageUrl} alt={`Image extracted using the first three words for ${fact}`} />}{!imageUrl && fact && <p>Cargando imagen...</p>} {/* Opcional: indicador de carga para la imagen */}
     </main>
-  )
+  );
 }
 ```
+En este código, toda la lógica de las API, el estado y los efectos está contenida dentro de la función `App`. Vemos cómo dos llamadas a `useEffect` coordinan la obtención del hecho y la imagen basándose en las dependencias.
 
-`App` es simple: llama a los hooks, obtiene los datos y la función para actualizar, y renderiza condicionalmente la UI basada en si los datos (`fact`, `imageUrl`) están cargados. El `handleClick` solo necesita llamar a `refreshFact`, y el sistema de hooks de React, junto con la dependencia `[fact]` en `useCatImage`, se encarga del resto automáticamente.
+---
+
+## El Componente `App` (Consolidado)
+
+Ahora, el componente `App` no solo renderiza, sino que también contiene:
+-   Los estados (`fact`, `imageUrl`).
+-   La lógica para obtener el hecho (`fetchRandomFact`).
+-   Dos `useEffect` para manejar los efectos secundarios de obtener datos:
+    -   El primer `useEffect` (con `[]`) se ejecuta al inicio para el hecho inicial.
+    -   El segundo `useEffect` (con `[fact]`) se ejecuta cada vez que `fact` cambia para obtener la imagen.
+-   El manejador de eventos `handleClick` que simplemente gatilla la obtención de un nuevo hecho.
 
 ---
 
 ## Continuación con el Segundo Enunciado (Extensiones Posibles)
 
-Ideas sobre cómo se podría extender esta prueba técnica:
--   Manejar estados de carga (`loading`).
--   Manejar errores si las APIs fallan.
--   Añadir tests unitarios para los hooks o componentes.
--   Mejorar el manejo de las palabras para la imagen (ej. más de 3, manejar puntuación).
--   Añadir un spinner de carga.
+Aunque la implementación es diferente, las posibles extensiones a la prueba técnica siguen siendo las mismas:
+-   Manejar estados de carga (`loading`): Se añadiría un estado `isLoading` y se modificarían las funciones de fetch y los efectos para actualizarlo.
+-   Manejar errores si las APIs fallan: Implementar bloques `try...catch` o usar `.catch()` en las promesas y mostrar mensajes de error en la UI.
+-   Añadir tests unitarios para el componente `App` (aunque probar efectos es más complejo que probar hooks puros).
+-   Mejorar el manejo de las palabras para la imagen (ej. considerar puntuación, usar más/menos palabras).
+-   Añadir un spinner de carga mientras se obtienen los datos.
+
+---
+
+## Sobre el Uso de console.log en Entrevistas
+
+Mantener el hábito de usar `console.log` de forma estratégica para mostrar el flujo, los valores de las variables o depurar problemas en tiempo real durante una prueba técnica o entrevista. En el código de ejemplo, hemos incluido un `console.log` comentado que sería útil en esta situación.
