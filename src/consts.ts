@@ -1,7 +1,7 @@
 export const CLASES = [
   {
     "id": "7iobxzd_2wY",
-    "slug": "01-inicio",
+    "slug": "01-react-desde-cero",
     "title": "¿Qué es React? Desde cero",
     "description": "Entiende qué es, para qué sirve y cómo funciona React. Desde lo más básico.",
     "learnings": ["Desde cero", "JSX", "props"],
