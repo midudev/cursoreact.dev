@@ -21,8 +21,10 @@ const number = `${index + 1}`.padStart(2, "0")
 ---
 
 <Layout title={`Clase Curso React - ${number}: ${info.title}`}>
-  <div class="mt-10 grid grid-cols-1 xl:grid-cols-[1fr_500px]">
-    <section class="w-full p-12 flex justify-center flex-col h-auto">
+  <div
+    class="mt-10 grid grid-cols-1 xl:grid-cols-[1fr_500px] max-w-[1800px] mx-auto"
+  >
+    <section class="w-full p-12 flex justify-center flex-col h-auto relative">
       <iframe
         class="w-full aspect-video h-auto"
         width="560"
@@ -33,19 +35,17 @@ const number = `${index + 1}`.padStart(2, "0")
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         referrerpolicy="strict-origin-when-cross-origin"
         allowfullscreen></iframe>
-      <h1
-        class:list={[
-          "font-semibold animate-fade-in animate-delay-300 mt-2 text-3xl mt-4 tracking-tighter",
-        ]}
-      >
-        {info.title}
-      </h1>
 
-      <div class="py-2">
-        <p class="mt-3 mb-4 font-light text-gray-800">
-          {info.description}
-        </p>
-        <ul class="inline-flex flex-wrap gap-2">
+      <div class="py-2 mx-auto max-w-2xl">
+        <h1
+          class:list={[
+            "font-semibold prose mt-2 text-5xl mb-2 mt-4 tracking-tighter",
+          ]}
+        >
+          {info.title}
+        </h1>
+
+        <ul class="inline-flex flex-wrap gap-2 mt-4">
           {
             info.learnings.map((learning) => (
               <li class="text-xs font-light text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
@@ -54,7 +54,8 @@ const number = `${index + 1}`.padStart(2, "0")
             ))
           }
         </ul>
-        <ul class="flex flex-wrap gap-2 mt-4">
+
+        <ul class="flex flex-wrap gap-2 mt-4 mb-10">
           <li>
             <a
               href={info.code}
@@ -145,45 +146,72 @@ const number = `${index + 1}`.padStart(2, "0")
             >
           </li>
         </ul>
+
+        <div
+          class="mt-3 mb-4 font-light text-gray-800 prose prose-h1:font-bold prose-h1:text-5xl prose-a:text-blue-600 mx-auto"
+        >
+          {
+            // Renderiza el MDX si existe, si no, muestra la descripción
+            (async () => {
+              try {
+                console.log(info.slug)
+                const MdxModule = await import(`../clases/${info.slug}.mdx`)
+                const MdxContent = MdxModule.default
+                console.log(MdxContent)
+                return (
+                  <Prose>
+                    <MdxContent />
+                  </Prose>
+                )
+              } catch (e) {
+                console.error(e)
+                return info.description
+              }
+            })()
+          }
+        </div>
       </div>
     </section>
-    <aside
-      class="flex flex-col md:flex-row lg:flex-col justify-center items-center lg:justify-start"
-    >
-      <InfoProject info={{ ...info, number }} />
+    <div class="relative lg:static">
+      <aside
+        class="flex flex-col md:flex-row lg:flex-col justify-center items-center lg:justify-start lg:sticky lg:top-8 top-0 z-10"
+        style="max-height: calc(100vh - 2rem);"
+      >
+        <InfoProject info={{ ...info, number }} />
 
-      <ul>
-        {
-          CLASES.map((clase, index) => {
-            const isActive = clase.slug === info.slug
-            return (
-              <li>
-                <a
-                  href={clase.slug}
-                  aria-disabled={isActive ? "true" : "false"}
-                  class:list={[
-                    { "pointer-events-none text-sky-800": isActive },
-                    "inline-flex items-center justify-center px-3 py-2 text-xs font-semibold text-center text-black bg-white transition rounded-lg hover:bg-sky-100/80 hover:scale-105 md:text-sm",
-                  ]}
-                >
-                  <span class="opacity-30 inline-block mr-1">
-                    #{index + 1} -{" "}
-                  </span>{" "}
-                  {clase.title}
-                </a>
-              </li>
-            )
-          })
-        }
-      </ul>
-    </aside>
+        <ul>
+          {
+            CLASES.map((clase, index) => {
+              const isActive = clase.slug === info.slug
+              return (
+                <li>
+                  <a
+                    href={clase.slug}
+                    aria-disabled={isActive ? "true" : "false"}
+                    class:list={[
+                      { "pointer-events-none text-sky-800": isActive },
+                      "inline-flex items-center justify-center px-3 py-2 text-xs font-semibold text-center text-black bg-white transition rounded-lg hover:bg-sky-100/80 hover:scale-105 md:text-sm",
+                    ]}
+                  >
+                    <span class="opacity-30 inline-block mr-1">
+                      #{index + 1} -{" "}
+                    </span>{" "}
+                    {clase.title}
+                  </a>
+                </li>
+              )
+            })
+          }
+        </ul>
+      </aside>
+    </div>
+    <Footer />
+
+    <style>
+      iframe {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+    </style>
   </div>
-  <Footer />
-
-  <style>
-    iframe {
-      border-radius: 8px;
-      overflow: hidden;
-    }
-  </style>
 </Layout>
