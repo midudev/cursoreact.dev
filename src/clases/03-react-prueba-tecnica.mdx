@@ -223,6 +223,7 @@ export function App () {
   )
 }
 ```
+
 `App` es simple: llama a los hooks, obtiene los datos y la función para actualizar, y renderiza condicionalmente la UI basada en si los datos (`fact`, `imageUrl`) están cargados. El `handleClick` solo necesita llamar a `refreshFact`, y el sistema de hooks de React, junto con la dependencia `[fact]` en `useCatImage`, se encarga del resto automáticamente.
 
 ---
