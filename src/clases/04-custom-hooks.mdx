@@ -1,0 +1,327 @@
+En la clase anterior, vimos dos de los hooks más importantes: `useState` para manejar el estado local de nuestros componentes y `useEffect` para sincronizar el estado con efectos secundarios (como peticiones asíncronas).
+
+Hoy vamos a abordar un concepto fundamental que te va a diferenciar en las pruebas técnicas y te va a permitir escribir código React mucho más limpio y reutilizable: los **Custom Hooks** (o ganchos personalizados).
+
+## El Problema: Lógica Repetida y Componentes Enredados
+
+En la clase anterior, teníamos un componente `App` que hacía varias cosas:
+1.  Manejar el estado del "hecho" del gatito (`fact`, `setFact`).
+2.  Manejar el estado de la URL de la imagen (`imageUrl`, `setImageUrl`).
+3.  Al cargar la página, hacía una petición para obtener un hecho aleatorio (`useEffect` con dependencia vacía `[]`).
+4.  Cada vez que el hecho cambiaba, generaba una URL para la imagen y hacía otra petición para obtenerla (`useEffect` con dependencia en `fact`).
+
+Aquí está el código inicial:
+
+```jsx
+import { useEffect, useState } from 'react'
+import './App.css'
+
+const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
+
+export function App () {
+  const [fact, setFact] = useState()
+  const [imageUrl, setImageUrl] = useState()
+
+  // para recuperar la cita al cargar la página
+  useEffect(() => {
+    fetch('https://catfact.ninja/fact')
+      .then(res => res.json())
+      .then(data => {
+        const { fact } = data
+        setFact(fact)
+      })
+  }, []) // <-- Solo se ejecuta al renderizar por primera vez
+
+  // para recuperar la imagen cada vez que tenemos una cita nueva
+  useEffect(() => {
+    if (!fact) return
+
+    const threeFirstWords = fact.split(' ', 3).join(' ')
+    console.log(threeFirstWords)
+
+    fetch(`https://cataas.com/cat/says/${threeFirstWords}?size=50&color=red&json=true`)
+      .then(res => res.json())
+      .then(response => {
+        const { url } = response
+        setImageUrl(url)
+      })
+  }, [fact]) // <-- Se ejecuta cada vez que cambia fact
+
+  return (
+    <main>
+      <h1>App de gatitos</h1>
+      {fact && <p>{fact}</p>}
+      {imageUrl && <img src={`${CAT_PREFIX_IMAGE_URL}${imageUrl}`} alt={`Image extracted using the first three words for ${fact}`} />}
+    </main>
+  )
+}
+```
+
+Este código funciona, pero ¿qué pasa si queremos reutilizar la lógica de obtener un hecho aleatorio en otro componente? ¿O la lógica de obtener la imagen? Tendríamos que copiar y pegar los `useEffect` y los `useState`, lo cual es mala práctica (código repetido).
+
+## Intentando Separar Lógica con Funciones Normales
+
+Un primer intento podría ser extraer la lógica de `fetch` en funciones separadas en otro archivo, por ejemplo `services/facts.js`.
+
+```js
+const CAT_ENDPOINT_RANDOM_FACT = 'https://catfact.ninja/fact'
+
+export const getRandomFact = async () => {
+  const res = await fetch(CAT_ENDPOINT_RANDOM_FACT)
+  const data = await res.json()
+  const { fact } = data
+  return fact
+}
+
+// ... (más funciones para otros servicios)
+```
+
+Y luego usar esta función en nuestro componente `App`:
+
+```jsx
+import { useEffect, useState } from 'react'
+import './App.css'
+import { getRandomFact } from './services/facts.js' // <-- Importamos la función
+
+const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
+
+export function App () {
+  const [fact, setFact] = useState()
+  const [imageUrl, setImageUrl] = useState()
+
+  // para recuperar la cita al cargar la página
+  useEffect(() => {
+    // Ahora llamamos a la función separada
+    getRandomFact().then(newFact => setFact(newFact))
+  }, [])
+
+  // para recuperar la imagen cada vez que tenemos una cita nueva
+  useEffect(() => {
+    if (!fact) return
+
+    const threeFirstWords = fact.split(' ', 3).join(' ')
+    console.log(threeFirstWords)
+
+    // Lógica de imagen aún aquí
+    fetch(`https://cataas.com/cat/says/${threeFirstWords}?size=50&color=red&json=true`)
+      .then(res => res.json())
+      .then(response => {
+        const { url } = response
+        setImageUrl(url)
+      })
+  }, [fact])
+
+  // Función para actualizar el hecho al hacer click en el botón
+  const handleNewFactClick = async () => { // <-- Aquí también necesitamos la lógica de fetch
+    const newFact = await getRandomFact() // <-- Reutilizamos la función
+    setFact(newFact) // <-- Y usamos el setter del estado
+  }
+
+  return (
+    <main>
+      <h1>App de gatitos</h1>
+      <button onClick={handleNewFactClick}>Get new fact</button> {/* <-- Botón añadido */}
+      {fact && <p>{fact}</p>}
+      {imageUrl && <img src={`${CAT_PREFIX_IMAGE_URL}${imageUrl}`} alt={`Image extracted using the first three words for ${fact}`} />}
+    </main>
+  )
+}
+```
+
+Esto mejora un poco la organización al separar la lógica de *fetch* de la lógica del componente. Sin embargo, la lógica de **manejo del estado** y la **sincronización con efectos (`useEffect`)** sigue atada al componente `App`. Todavía tenemos los `useState` y los `useEffect` directamente en `App`.
+
+Si quisiéramos reutilizar la lógica de obtener el hecho *junto con su estado* en otro componente, seguiríamos teniendo que copiar y pegar el `useState` y el `useEffect` del `fact`. Además, la función `getRandomFact` original **necesitaba que le pasáramos el `setFact` como parámetro** para poder actualizar el estado del componente que la llamara. Esto crea una dependencia fuerte y no es la forma ideal de manejar el estado en React cuando se extrae lógica.
+
+## Solución: Custom Hooks
+
+Los Custom Hooks nos permiten empaquetar lógica que utiliza hooks nativos (`useState`, `useEffect`, etc.) de forma que pueda ser reutilizada fácilmente entre componentes.
+
+**Regla fundamental de los Custom Hooks:**
+1.  Deben ser funciones de JavaScript.
+2.  **Deben empezar con la palabra `use`** (ej: `useMiHook`, `useFetchData`). Esto es una convención que React utiliza para identificar que una función es un Hook y aplicar las reglas de los Hooks (no llamarlos dentro de bucles, condicionales, etc.).
+3.  **Solo pueden llamar a otros Hooks** (nativos o personalizados) **en el nivel superior** de su cuerpo (no dentro de condicionales, bucles, o funciones anidadas).
+4.  Pueden recibir parámetros y devolver cualquier cosa (estado, funciones, objetos, etc.).
+
+### Custom Hook para la Imagen: `useCatImage`
+
+Vamos a extraer la lógica de obtener la imagen a un custom hook. Esta lógica depende del `fact`.
+
+Creamos un nuevo archivo: `hooks/useCatImage.js`
+
+```jsx
+import { useEffect, useState } from 'react'
+
+const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
+
+export function useCatImage ({ fact }) { // <-- Es una función que empieza por "use"
+  const [imageUrl, setImageUrl] = useState() // <-- Utiliza useState internamente
+
+  // para recuperar la imagen cada vez que tenemos una cita nueva
+  useEffect(() => { // <-- Utiliza useEffect internamente
+    if (!fact) return
+
+    const threeFirstWords = fact.split(' ', 3).join(' ')
+
+    fetch(`https://cataas.com/cat/says/${threeFirstWords}?size=50&color=red&json=true`)
+      .then(res => res.json())
+      .then(response => {
+        const { url } = response
+        setImageUrl(url)
+      })
+  }, [fact]) // <-- Depende del fact que recibe como parámetro
+
+  return { imageUrl } // <-- Devuelve el estado que maneja
+}
+```
+
+Ahora, en nuestro componente `App`, podemos usar este custom hook:
+
+```jsx
+import { useEffect, useState } from 'react'
+import './App.css'
+import { getRandomFact } from './services/facts.js'
+import { useCatImage } from './hooks/useCatImage.js' // <-- Importamos el custom hook de imagen
+
+const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
+
+export function App () {
+  const [fact, setFact] = useState()
+  const { imageUrl } = useCatImage({ fact }) // <-- Usamos el custom hook de imagen
+
+  // para recuperar la cita al cargar la página
+  useEffect(() => {
+    getRandomFact().then(newFact => setFact(newFact))
+  }, [])
+
+  // Función para actualizar el hecho al hacer click en el botón
+  const handleNewFactClick = async () => {
+    const newFact = await getRandomFact()
+    setFact(newFact)
+  }
+
+  return (
+    <main>
+      <h1>App de gatitos</h1>
+      <button onClick={handleNewFactClick}>Get new fact</button>
+      {fact && <p>{fact}</p>}
+      {imageUrl && <img src={`${CAT_PREFIX_IMAGE_URL}${imageUrl}`} alt={`Image extracted using the first three words for ${fact}`} />} {/* <-- Usamos el estado devuelto por el hook */}
+    </main>
+  )
+}
+```
+
+El componente `App` ahora ya no tiene el `useState` de `imageUrl` ni el `useEffect` que lo maneja. Esa lógica está encapsulada en `useCatImage`. El componente `App` solo necesita saber que si le pasa un `fact` a `useCatImage`, este le devolverá un `imageUrl`. Es una **caja negra** que hace su trabajo.
+
+### Custom Hook para el Hecho: `useCatFact`
+
+Vamos a hacer lo mismo para la lógica de obtener el hecho. Esta lógica maneja su propio estado (`fact`) y la acción para actualizarlo.
+
+Creamos un nuevo archivo: `hooks/useCatFact.js`
+
+```jsx
+import { useEffect, useState } from 'react'
+import { getRandomFact } from '../services/facts.js' // <-- Importamos la función de servicio
+
+export function useCatFact () { // <-- Es una función que empieza por "use"
+  const [fact, setFact] = useState() // <-- Utiliza useState internamente
+
+  const refreshFact = () => { // <-- Es una función que expone la acción de actualizar
+    getRandomFact().then(newFact => setFact(newFact))
+  }
+
+  // para recuperar la cita al cargar la página
+  useEffect(() => { // <-- Utiliza useEffect internamente
+    refreshFact() // <-- Llama a la acción interna al montar
+  }, []) // <-- Solo se ejecuta al renderizar por primera vez
+
+  return { fact, refreshFact } // <-- Devuelve el estado y la acción
+}
+```
+
+En este custom hook, no solo manejamos el estado `fact` y el `useEffect` inicial, sino que también extraemos la lógica de `fetch` a una función `refreshFact` **dentro del hook**. El hook `useCatFact` expone tanto el estado `fact` como la función `refreshFact`.
+
+Ahora, refactorizamos `App` nuevamente:
+
+```jsx
+import { useEffect, useState } from 'react' // <-- Ya no necesitamos useState aquí
+import './App.css'
+import { useCatFact } from './hooks/useCatFact.js' // <-- Importamos el custom hook de hecho
+import { useCatImage } from './hooks/useCatImage.js'
+
+const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
+
+export function App () {
+  const { fact, refreshFact } = useCatFact() // <-- Usamos el custom hook de hecho
+  const { imageUrl } = useCatImage({ fact }) // <-- Usamos el custom hook de imagen
+
+  // ¡Ya no hay useEffects nativos! La lógica está en los custom hooks
+
+  // Función para actualizar el hecho al hacer click en el botón
+  const handleNewFactClick = () => { // <-- Solo llamamos a la función expuesta por el hook de hecho
+    refreshFact()
+  }
+
+  return (
+    <main>
+      <h1>App de gatitos</h1>
+      <button onClick={handleNewFactClick}>Get new fact</button>
+      {fact && <p>{fact}</p>} {/* <-- Usamos el estado devuelto por el hook */}
+      {imageUrl && <img src={`${CAT_PREFIX_IMAGE_URL}${imageUrl}`} alt={`Image extracted using the first three words for ${fact}`} />} {/* <-- Usamos el estado devuelto por el hook */}
+    </main>
+  )
+}
+```
+
+¡Mira qué limpio ha quedado el componente `App`! Solo se preocupa de renderizar los datos y manejar las interacciones del usuario. La lógica de obtener y actualizar el hecho y la imagen está totalmente encapsulada en los custom hooks.
+
+## Buenas Prácticas con Custom Hooks
+
+1.  **Nombrar correctamente:** Siempre empieza con `use`. Esto permite a React (y a las herramientas de linting) entender que son hooks y aplicar las reglas correspondientes.
+2.  **Encapsular la lógica de estado y efectos:** Si una lógica necesita `useState`, `useEffect`, etc., es una buena candidata para un custom hook. Oculta los setters (`setFact`, `setImageUrl`) dentro del hook si es posible, exponiendo solo la acción que desencadena el cambio (como `refreshFact`) o el estado final (`fact`, `imageUrl`). Esto hace que la interfaz del hook sea más simple y controlada.
+3.  **Parametrizar:** Pasa las dependencias necesarias (como `fact` en `useCatImage`) como parámetros. Usar objetos para los parámetros facilita la extensibilidad si necesitas añadir más opciones en el futuro.
+4.  **Separar por responsabilidad:** Cada custom hook debería tener una responsabilidad clara (ej: obtener un hecho, obtener una imagen).
+5.  **La Implementación No es el Nombre:** Evita nombres de hooks que describan cómo funcionan internamente (ej: `useFetchCatFact`, `useReduxGlobalStore`). El nombre debe describir *qué hacen* desde la perspectiva del componente que los usa (ej: `useCatFact`, `useCatImage`). Esto te permite cambiar la implementación interna del hook (pasar de fetch a axios, de Redux a Zustand) sin cambiar el nombre del hook ni cómo se usa en los componentes. Este es el **principio de inversión de dependencias** aplicado a Hooks.
+
+## Testing con Playwright (End-to-End)
+
+Una vez que tenemos nuestros componentes limpios y nuestra lógica encapsulada en hooks, podemos testear. Para verificar que todo funciona como un usuario final esperaría (se muestra el hecho, se muestra la imagen), un test **End-to-End (E2E)** es una excelente opción.
+
+En el video se muestra una configuración básica con Playwright. Aquí tienes un ejemplo de cómo se vería un test simple para nuestra aplicación de gatitos:
+
+```js
+import { test, expect } from '@playwright/test';
+
+// Puedes definir la URL base aquí o en un archivo de configuración de Playwright
+const LOCALHOST_URL = 'http://localhost:5173'; // <-- Ajusta si tu puerto es diferente
+
+test('app shows random fact and image', async ({ page }) => {
+  // Navega a la página principal
+  await page.goto(LOCALHOST_URL);
+
+  // Espera a que el párrafo con el hecho aparezca y no esté vacío
+  const factElement = await page.getByRole('paragraph');
+  const factText = await factElement.textContent();
+  expect(factText).not.toBeNull(); // Que tenga contenido
+  expect(factText.length).toBeGreaterThan(0); // Que el texto no esté vacío
+
+  // Espera a que la imagen aparezca
+  const imageElement = await page.getByRole('img');
+  const imageSrc = await imageElement.getAttribute('src');
+
+  // Verifica que la URL de la imagen no esté vacía y empiece con el prefijo correcto
+  expect(imageSrc).not.toBeNull();
+  expect(imageSrc.length).toBeGreaterThan(0);
+  // Si tu prefijo es variable, podrías importarlo o usar una regex más flexible
+  expect(imageSrc.startsWith('https://cataas.com')).toBe(true);
+
+  // Opcional: Haz click en el botón y verifica que el texto/imagen cambian (más avanzado)
+  // await page.getByRole('button', { name: 'Get new fact' }).click();
+  // ... esperar nuevos elementos o cambios en el texto/src
+});
+```
+
+Este test verifica que, después de cargar la página, aparece un párrafo con texto (el hecho) y una imagen con una URL válida que comienza con el prefijo esperado. No necesita saber *cómo* React obtiene el hecho o la imagen, solo verifica el resultado final visible para el usuario.
+
+Para correr este test, después de instalar Playwright (`npm init playwright@latest` y seguir los pasos), usarías el comando `npx playwright test`.
+
+*(Recuerda revisar el repositorio de GitHub [midududev/aprendiendo-react](https://github.com/midududev/aprendiendo-react) para ver el código de este proyecto y de las clases anteriores.)*
