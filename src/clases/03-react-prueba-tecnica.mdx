@@ -1,0 +1,237 @@
+En esta clase, desglosaremos una prueba técnica común en React: construir una aplicación que muestre hechos sobre gatos y una imagen relacionada, utilizando buenas prácticas como hooks personalizados y manejo de estado.
+
+🔗 Repositorio con todo el código:
+[https://github.com/midudev/aprendiendo-react/tree/master/projects/04-react-prueba-tecnica](https://github.com/midudev/aprendiendo-react/tree/master/projects/04-react-prueba-tecnica)
+
+## Enunciado de la Prueba Técnica
+
+Descripción de la tarea: Crear una aplicación React que al cargar muestre un hecho aleatorio sobre gatos y una imagen relacionada con el hecho. Debe haber un botón para obtener un nuevo hecho y su imagen correspondiente.
+
+---
+
+## Inicio del Proyecto
+
+Pasos iniciales para configurar un proyecto React básico, probablemente usando una herramienta como Vite o Create React App.
+
+```bash
+# Ejemplo con Vite
+npm create vite@latest cat-fact-app --template react
+cd cat-fact-app
+npm install
+```
+
+## Punto de Entrada de Nuestra Aplicación
+
+Explicación del archivo principal (`main.jsx` o `index.js`) donde se monta la aplicación React en el DOM.
+
+```jsx
+// src/main.jsx (ejemplo con Vite)
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
+```
+
+---
+
+## JSX
+
+Repaso de la sintaxis JSX, utilizada para describir la estructura de la UI en React. Vemos cómo se usa en el componente `App`.
+
+```jsx
+// Fragmento de src/App.jsx
+return (
+  <main>
+    <h1>App de gatitos</h1>
+    <button onClick={handleClick}>Get new fact</button>
+    {fact && <p>{fact}</p>} {/* Renderizado condicional */}
+    {imageUrl && <img src={imageUrl} alt={`Image extracted using the first three words for ${fact}`} />} {/* Renderizado condicional */}
+  </main>
+)
+```
+Aquí vemos cómo combinamos HTML-like syntax con lógica JavaScript (variables entre `{}` y renderizado condicional con `&&`).
+
+---
+
+## Instalación del Linter
+
+Importancia de configurar herramientas como ESLint y Prettier para mantener un código limpio, consistente y libre de errores comunes.
+
+```bash
+# Ejemplo: Instalar dependencias para linter y formateador
+npm install --save-dev eslint prettier eslint-plugin-react eslint-config-prettier eslint-plugin-jsx-a11y eslint-plugin-import
+```
+(Configuración específica puede variar, referirse al repositorio).
+
+---
+
+## Creación de Componentes y Hooks Personalizados
+
+En lugar de un único componente grande, separamos la lógica usando hooks personalizados (`useCatFact`, `useCatImage`) para manejar diferentes partes del estado y efectos secundarios. El componente `App` se encarga de la presentación.
+
+---
+
+## Creación y Manejo del Estado
+
+Utilizamos el hook `useState` para gestionar el estado mutable dentro de nuestros hooks personalizados.
+
+En `useCatFact.jsx`:
+```jsx
+import { useState } from 'react';
+// ...
+export function useCatFact () {
+  const [fact, setFact] = useState(); // Estado para almacenar el hecho
+  // ...
+  return { fact, refreshFact }
+}
+```
+
+En `useCatImage.jsx`:
+```jsx
+import { useState } from 'react';
+// ...
+export function useCatImage ({ fact }) {
+  const [imageUrl, setImageUrl] = useState(); // Estado para almacenar la URL de la imagen
+  // ...
+  return { imageUrl: `${CAT_PREFIX_IMAGE_URL}${imageUrl}` }
+}
+```
+Cada hook gestiona su propio estado relevante.
+
+---
+
+## Estrategia al Afrontar la Prueba y las APIs
+
+Cómo dividir la prueba:
+1.  Obtener el hecho del gato.
+2.  Obtener la imagen basada en el hecho.
+3.  Mostrar ambos.
+4.  Implementar el botón para obtener un nuevo par hecho/imagen.
+
+Esto nos lleva a la idea de dos llamadas a API distintas y cómo coordinarlas. `useCatFact` maneja la primera llamada, y `useCatImage` maneja la segunda, dependiendo del resultado de la primera.
+
+---
+
+## Hooks `useCatFact` y `useCatImage`
+
+Desglose de la lógica encapsulada en cada hook.
+
+### `useCatFact.jsx`
+
+Este hook se encarga de:
+-   Mantener el estado del `fact`.
+-   Tener una función `refreshFact` para obtener un nuevo hecho.
+-   Utilizar `useEffect` para llamar a `refreshFact` *una vez* al montar el componente (para tener un hecho inicial).
+
+```jsx
+// src/hooks/useCatFact.js
+import { useState, useEffect } from 'react'
+import { getRandomFact } from '../services/facts.js' // Asumimos un servicio
+
+export function useCatFact () {
+  const [fact, setFact] = useState()
+
+  const refreshFact = () => {
+    getRandomFact().then(newFact => setFact(newFact))
+  }
+
+  // Efecto: Recuperar la cita al cargar la página (solo una vez)
+  useEffect(refreshFact, []) // Dependencia vacía: se ejecuta al montar
+
+  return { fact, refreshFact } // Exponemos el estado y la función para actualizar
+}
+```
+
+### `useCatImage.jsx`
+
+Este hook se encarga de:
+-   Mantener el estado de la `imageUrl`.
+-   Recibir el `fact` como entrada.
+-   Utilizar `useEffect` para obtener la imagen *cada vez que el `fact` cambia*.
+-   Construir la URL de la imagen usando parte del hecho y un prefijo base.
+
+```jsx
+// src/hooks/useCatImage.js
+import { useEffect, useState } from 'react'
+
+const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
+
+export function useCatImage ({ fact }) {
+  const [imageUrl, setImageUrl] = useState()
+
+  // Efecto: Recuperar la imagen cada vez que tenemos una cita nueva
+  useEffect(() => {
+    if (!fact) return // No hacemos nada si no hay fact todavía
+
+    // Extraer las primeras 3 palabras
+    const threeFirstWords = fact.split(' ', 3).join(' ')
+
+    // Construir y hacer la llamada a la API de imágenes
+    fetch(`https://cataas.com/cat/says/${threeFirstWords}?size=50&color=red&json=true`)
+      .then(res => res.json())
+      .then(response => {
+        const { _id } = response
+        // La API nos da un ID, construimos la URL final
+        const url = `/cat/${_id}/says/${threeFirstWords}`
+        setImageUrl(url) // Actualizamos el estado de la imagen
+      })
+  }, [fact]) // Dependencia: este efecto se re-ejecuta cuando 'fact' cambia
+
+  return { imageUrl: `${CAT_PREFIX_IMAGE_URL}${imageUrl}` } // Exponemos la URL completa
+}
+```
+
+---
+
+## El Componente `App`
+
+Este componente orquesta el uso de los hooks y maneja la interacción del usuario.
+
+```jsx
+// src/App.jsx
+import './App.css'
+import { useCatImage } from './hooks/useCatImage.js'
+import { useCatFact } from './hooks/useCatFact.js'
+
+export function App () {
+  // Usamos los hooks
+  const { fact, refreshFact } = useCatFact()
+  const { imageUrl } = useCatImage({ fact }) // useCatImage depende de fact
+
+  // Manejador del click del botón
+  const handleClick = async () => {
+    refreshFact() // Al hacer click, solo necesitamos obtener un nuevo fact
+    // useCatImage automáticamente reaccionará al cambio de fact gracias a su useEffect
+  }
+
+  return (
+    <main>
+      <h1>App de gatitos</h1>
+
+      <button onClick={handleClick}>Get new fact</button>
+
+      {/* Mostramos fact y imagen solo si están disponibles */}
+      {fact && <p>{fact}</p>}
+      {imageUrl && <img src={imageUrl} alt={`Image extracted using the first three words for ${fact}`} />}
+    </main>
+  )
+}
+```
+`App` es simple: llama a los hooks, obtiene los datos y la función para actualizar, y renderiza condicionalmente la UI basada en si los datos (`fact`, `imageUrl`) están cargados. El `handleClick` solo necesita llamar a `refreshFact`, y el sistema de hooks de React, junto con la dependencia `[fact]` en `useCatImage`, se encarga del resto automáticamente.
+
+---
+
+## Continuación con el Segundo Enunciado (Extensiones Posibles)
+
+Ideas sobre cómo se podría extender esta prueba técnica:
+-   Manejar estados de carga (`loading`).
+-   Manejar errores si las APIs fallan.
+-   Añadir tests unitarios para los hooks o componentes.
+-   Mejorar el manejo de las palabras para la imagen (ej. más de 3, manejar puntuación).
+-   Añadir un spinner de carga.
