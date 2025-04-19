@@ -1,0 +1,370 @@
+```markdown
+## Inicialización del proyecto
+
+Pasos para configurar un nuevo proyecto, probablemente utilizando herramientas comoVite, o similar.
+
+```bash
+# Usando Vite
+npm create vite@latest my-project --template react
+cd my-project
+npm install
+npm run dev
+```
+
+## Sobre los estilos del proyecto
+
+Discute cómo se gestionan los estilos en el proyecto (CSS, módulos CSS, styled-components, etc.).
+
+```css
+/* Ejemplo básico de estilos */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f0f0;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 5px;
+}
+```
+
+## Dibujando el tablero
+
+Cómo renderizar la interfaz visual del tablero del juego (por ejemplo, un tablero de Tic-Tac-Toe). Esto implica renderizar componentes basados en datos.
+
+```jsx
+// Ejemplo básico de cómo dibujar un tablero
+function Board({ squares, onClick }) {
+  return (
+    <div className="board">
+      {squares.map((square, i) => (
+        <button key={i} className="square" onClick={() => onClick(i)}>
+          {square}
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+## Inicializar el estado
+
+Configurando el estado inicial de la aplicación, probablemente usando el hook `useState` en React.
+
+```jsx
+import { useState } from 'react';
+
+function Game() {
+  const [board, setBoard] = useState(Array(9).fill(null));
+  // ...otros estados
+}
+```
+
+## Estado con los turnos
+
+Gestión de qué jugador tiene el turno actual, también usando `useState`.
+
+```jsx
+import { useState } from 'react';
+
+function Game() {
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [isXNext, setIsXNext] = useState(true); // true si es turno de X, false si es turno de O
+  // ...
+}
+```
+
+## Actualizando el tablero al hacer click
+
+Implementación de la lógica para manejar un click en una celda del tablero y actualizar el estado correspondiente.
+
+```jsx
+function Game() {
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [isXNext, setIsXNext] = useState(true);
+
+  const handleClick = (index) => {
+    // Crear una copia del tablero para no mutar el estado directamente
+    const newBoard = [...board];
+
+    // Lógica para actualizar la celda si está vacía
+    if (newBoard[index] === null) {
+      newBoard[index] = isXNext ? 'X' : 'O';
+      setBoard(newBoard);
+      setIsXNext(!isXNext); // Cambiar el turno
+    }
+  };
+
+  return (
+    <Board squares={board} onClick={handleClick} />
+  );
+}
+```
+
+## Lógica del tablero
+
+Discusión sobre las reglas del juego y cómo se aplican (por ejemplo, no permitir clicks en celdas ocupadas).
+
+## Ajustando el final del juego
+
+Cómo determinar cuándo el juego ha terminado (victoria, empate).
+
+## Detectar el ganador
+
+Implementación de la función o lógica para verificar si hay un ganador en el estado actual del tablero.
+
+```javascript
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a]; // Retorna 'X' o 'O' si hay ganador
+    }
+  }
+  return null; // No hay ganador
+}
+```
+
+## El estado es asíncrono
+
+Explicación importante sobre cómo las actualizaciones de estado en React (usando `setState`) pueden ser asíncronas y cómo manejarlo.
+
+```javascript
+// Esto puede no reflejar el estado más reciente inmediatamente
+setCount(count + 1);
+console.log(count); // Puede mostrar el valor anterior
+```
+
+## Cómo crear el reset del juego
+
+Implementar una función o botón para reiniciar el juego a su estado inicial.
+
+```jsx
+function Game() {
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [isXNext, setIsXNext] = useState(true);
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setIsXNext(true);
+  };
+
+  // ...render
+  return (
+    <div>
+      <Board squares={board} onClick={handleClick} />
+      <button onClick={resetGame}>Reiniciar Juego</button>
+    </div>
+  );
+}
+```
+
+## Lanzar confetti cuando gane la partida
+
+Añadir efectos visuales, como confetti, al detectar que un jugador ha ganado. Esto a menudo implica renderizado condicional o uso de bibliotecas de animación.
+
+```jsx
+// Ejemplo conceptual usando renderizado condicional
+function Game() {
+  // ...estados y lógica
+  const winner = calculateWinner(board);
+
+  return (
+    <div>
+      {winner && <ConfettiAnimation />} {/* Mostrar confetti si hay ganador */}
+      <Board squares={board} onClick={handleClick} />
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+## Buenas prácticas separación de constante
+
+Discutir la importancia de definir constantes importantes (como las combinaciones ganadoras) separadamente para mejorar la legibilidad y mantenibilidad.
+
+```javascript
+// En un archivo de constantes (constants.js)
+export const WINNING_COMBINATIONS = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  // ...otras combinaciones
+];
+
+// En el componente
+import { WINNING_COMBINATIONS } from './constants';
+
+function calculateWinner(squares) {
+  for (let i = 0; i < WINNING_COMBINATIONS.length; i++) {
+    const [a, b, c] = WINNING_COMBINATIONS[i];
+    // ...
+  }
+  // ...
+}
+```
+
+## Persistir la partida en localStorage
+
+Cómo guardar el estado del juego en `localStorage` del navegador para que persista entre recargas de página.
+
+```javascript
+// Guardar estado
+localStorage.setItem('gameBoard', JSON.stringify(board));
+localStorage.setItem('isXNext', JSON.stringify(isXNext));
+
+// Recuperar estado al inicio
+const savedBoard = JSON.parse(localStorage.getItem('gameBoard'));
+const savedIsXNext = JSON.parse(localStorage.getItem('isXNext'));
+
+const [board, setBoard] = useState(savedBoard || Array(9).fill(null));
+const [isXNext, setIsXNext] = useState(savedIsXNext !== null ? savedIsXNext : true);
+```
+
+## No puedes usar localStorage en el servidor
+
+Una advertencia importante sobre el uso de APIs del navegador como `localStorage` en entornos de renderizado del lado del servidor (SSR), ya que no están disponibles.
+
+```javascript
+// Código que falla en SSR
+if (typeof window !== 'undefined') {
+  // Este código solo se ejecuta en el navegador
+  localStorage.setItem('test', 'value');
+}
+```
+
+## Aprende el hook useEffect
+
+Introducción al hook `useEffect` para realizar efectos secundarios en componentes funcionales (suscripciones, llamadas a API, manipulación del DOM, etc.).
+
+```jsx
+import { useEffect } from 'react';
+
+function MyComponent() {
+  useEffect(() => {
+    // Este código se ejecuta después del renderizado inicial
+    // y después de cada actualización (por defecto)
+    console.log('Componente renderizado o actualizado');
+
+    // Opcional: una función de limpieza
+    return () => {
+      console.log('Limpieza');
+    };
+  }); // Sin array de dependencias
+
+  // ...render
+}
+```
+
+## Configurar linter para monorepo
+
+Pasos para configurar herramientas de linting y formateo (ESLint, Prettier) en una estructura de monorepo.
+
+```json
+// Ejemplo de archivo .eslintrc.js en la raíz del monorepo
+module.exports = {
+  root: true,
+  extends: ['eslint:recommended'],
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
+  overrides: [
+    {
+      files: ['*.js', '*.jsx'],
+      extends: ['plugin:react/recommended', 'plugin:react-hooks/recommended'],
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+        ecmaVersion: 2020,
+        sourceType: 'module',
+      },
+    },
+    // ...otras configuraciones para diferentes paquetes/lenguajes
+  ],
+};
+```
+
+## Creamos el segundo proyecto y aprendemos useEffect
+
+Aplicar los conocimientos de `useEffect` en un nuevo contexto o proyecto para reforzar el aprendizaje.
+
+```jsx
+import { useState, useEffect } from 'react';
+
+function DataFetcher() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('https://api.example.com/data')
+      .then(response => response.json())
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      });
+  }, []); // Array de dependencias vacío: se ejecuta solo una vez al montar
+
+  if (loading) return <p>Cargando...</p>;
+  return <p>Datos: {JSON.stringify(data)}</p>;
+}
+```
+
+## Limpiando efectos
+
+Explicar la importancia de la función de retorno en `useEffect` para limpiar recursos (suscripciones, timers, etc.) cuando el componente se desmonta o el efecto se re-ejecuta.
+
+```jsx
+import { useEffect } from 'react';
+
+function Timer() {
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      console.log('Tick');
+    }, 1000);
+
+    // Función de limpieza
+    return () => {
+      console.log('Limpiando intervalo');
+      clearInterval(intervalId);
+    };
+  }, []); // Se ejecuta solo una vez
+}
+```
+
+## ¿Por qué se ejecuta dos veces el efecto?
+
+Discusión sobre el comportamiento del `useEffect` ejecutándose dos veces en desarrollo cuando el Strict Mode de React está activado.
+
+```jsx
+// En index.js o main.jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode> {/* <-- Strict Mode aquí */}
+    <App />
+  </React.StrictMode>,
+);
+
+// Cuando App tiene un useEffect simple, se ejecutará dos veces
+// en desarrollo debido a Strict Mode. Esto ayuda a detectar efectos con limpieza incorrecta.
+```
