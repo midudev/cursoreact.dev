@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/check": "0.9.4",
     "@astrojs/mdx": "4.2.4",
+    "@astrojs/sitemap": "3.3.0",
     "@astrojs/tailwind": "6.0.2",
     "@midudev/tailwind-animations": "0.2.0",
     "@tailwindcss/typography": "0.5.16",
