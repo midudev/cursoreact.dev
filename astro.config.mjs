@@ -7,6 +7,9 @@ import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
+  build: {
+    inlineStylesheets: 'always'
+  },
   integrations: [mdx(), sitemap()],
   site: 'https://cursoreact.dev',
   vite: {
