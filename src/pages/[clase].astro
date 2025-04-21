@@ -156,7 +156,6 @@ const number = `${index + 1}`.padStart(2, "0")
               try {
                 const MdxModule = await import(`../clases/${info.slug}.mdx`)
                 const MdxContent = MdxModule.default
-                console.log(MdxContent)
                 return <MdxContent />
               } catch (e) {
                 console.error(e)
