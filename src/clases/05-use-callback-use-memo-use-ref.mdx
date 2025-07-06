@@ -1,0 +1,71 @@
+# useCallback, useMemo y useRef
+
+En esta clase aprenderás a usar tres hooks fundamentales de React para optimizar el rendimiento de tus componentes:
+
+## useCallback
+
+El hook `useCallback` te permite memorizar funciones para evitar recreaciones innecesarias en cada render.
+
+```jsx
+import { useCallback } from 'react'
+
+function MyComponent({ onItemClick }) {
+  const handleClick = useCallback((id) => {
+    onItemClick(id)
+  }, [onItemClick])
+
+  return (
+    <button onClick={() => handleClick(1)}>
+      Click me
+    </button>
+  )
+}
+```
+
+## useMemo
+
+El hook `useMemo` te permite memorizar valores computados costosos.
+
+```jsx
+import { useMemo } from 'react'
+
+function ExpensiveComponent({ items }) {
+  const sortedItems = useMemo(() => {
+    return items.sort((a, b) => a.name.localeCompare(b.name))
+  }, [items])
+
+  return (
+    <ul>
+      {sortedItems.map(item => (
+        <li key={item.id}>{item.name}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+## useRef
+
+El hook `useRef` te permite crear referencias mutables que persisten entre renders.
+
+```jsx
+import { useRef, useEffect } from 'react'
+
+function FocusInput() {
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    inputRef.current.focus()
+  }, [])
+
+  return <input ref={inputRef} type="text" />
+}
+```
+
+## Cuándo usar cada uno
+
+- **useCallback**: Cuando pasas funciones como props a componentes hijos que usan `React.memo`
+- **useMemo**: Para cálculos costosos que no necesitan recalcularse en cada render
+- **useRef**: Para acceder directamente a elementos del DOM o mantener valores que no causan re-renders
+
+Estos hooks son fundamentales para optimizar el rendimiento de aplicaciones React complejas. 
