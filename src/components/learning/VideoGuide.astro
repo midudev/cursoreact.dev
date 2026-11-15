@@ -1,0 +1,30 @@
+---
+import type { Transcript } from '../../types/transcript'
+interface Props { slug: string }
+const { slug } = Astro.props
+const sources = import.meta.glob<Transcript>('../../data/transcripts/*.json', { eager: true, import: 'default' })
+const source = sources[`../../data/transcripts/${slug}.json`]
+const time = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
+---
+{source && <details class="video-guide not-prose">
+  <summary><span>Vídeo, capítulos y transcripción</span><span class="guide-meta">{Math.round(source.duration / 60)} min <span aria-hidden="true">⌄</span></span></summary>
+  <div class="guide-content">
+    <p>Contenido acompañado de los subtítulos automáticos del vídeo. La transcripción puede contener errores de reconocimiento.</p>
+    <div class="guide-links"><a href={`/transcripciones/${slug}`}>Leer transcripción completa</a><a href={`/transcripciones/${slug}.txt`} download>Descargar .txt</a></div>
+    {source.chapters.length > 0 && <ol>{source.chapters.map(ch => <li><a href={`${source.source}&t=${ch.start}`} target="_blank" rel="noopener noreferrer"><span>{time(ch.start)}</span>{ch.title}</a></li>)}</ol>}
+  </div>
+</details>}
+<style>
+  .video-guide { border: 1px solid var(--lesson-border); border-radius: 12px; margin: 0 0 2rem; background: #f8fafc; }
+  summary { cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.1rem; color: #334155; font-size: .85rem; font-weight: 600; }
+  summary::marker { content: ''; }
+  .guide-meta { white-space: nowrap; color: #64748b; font-size: .75rem; }
+  .guide-meta span { margin-left: .5rem; }
+  .guide-content { padding: 0 1.1rem 1rem; font-size: .85rem; color: #475569; }
+  p { margin: 0 0 .8rem; }
+  .guide-links { display: flex; flex-wrap: wrap; gap: 1rem; font-weight: 650; color: #0369a1; margin-bottom: 1rem; }
+  ol { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: .5rem 1rem; list-style: none; padding: 0; }
+  li a { display: flex; gap: .6rem; align-items: baseline; line-height: 1.5; }
+  li a:hover { color: #0369a1; }
+  li span { color: #0369a1; font-size: .75rem; font-variant-numeric: tabular-nums; flex: 0 0 40px; }
+</style>

@@ -1,8 +1,5 @@
-
-🔗 Repositorio del código original:
-[https://github.com/midudev/aprendiendo-react/tree/master/projects/04-react-prueba-tecnica](https://github.com/midudev/aprendiendo-react/tree/master/projects/04-react-prueba-tecnica)
-
----
+import LearningDiagram from "../components/learning/LearningDiagram.astro"
+import LessonNote from "../components/learning/LessonNote.astro"
 
 ## Enunciado de la Prueba Técnica
 
@@ -10,9 +7,17 @@ Crear una aplicación React que al cargar muestre un hecho aleatorio sobre gatos
 
 ---
 
+<LessonNote title="Haz visible lo que puede fallar" tone="idea">
+Una petición puede tardar o fallar. Enseñar un estado de carga y un mensaje de error forma parte de resolver la prueba.
+</LessonNote>
+
+<LearningDiagram title="Dos peticiones, una imagen" steps={[{"title": "Hecho", "code": "GET /fact", "text": "Primero obtienes un hecho desde la API. Comprueba que la respuesta sea correcta antes de extraer sus datos."}, {"title": "Palabras", "code": "fact.split(\" \").slice(0, 3)", "text": "Del texto extraes las palabras que necesitas para construir la segunda petición."}, {"title": "Imagen", "code": "encodeURIComponent(palabras)", "text": "Construye la URL de la imagen con el texto codificado. Representa también los estados de carga y error."}]} />
+
+> Una buena interfaz también cuenta qué está pasando mientras los datos llegan.
+
 ## Inicio del Proyecto
 
-Pasos iniciales para configurar un proyecto React básico, probablemente usando una herramienta como Vite o Create React App.
+El vídeo inicia el proyecto con Vite. Crea la aplicación, instala sus dependencias y ejecuta el servidor de desarrollo antes de añadir la petición a la API.
 
 ```bash
 # Ejemplo con Vite
@@ -25,7 +30,7 @@ npm install
 
 ## Punto de Entrada de Nuestra Aplicación
 
-Explicación del archivo principal (`main.jsx` o `index.js`) donde se monta la aplicación React en el DOM.
+El archivo `main.jsx` conecta el elemento raíz del documento con el componente App mediante createRoot. A partir de ahí, React controla el contenido de ese árbol.
 
 ```jsx
 // src/main.jsx (ejemplo con Vite)

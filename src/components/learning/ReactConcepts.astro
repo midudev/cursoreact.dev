@@ -1,0 +1,72 @@
+---
+import DemoLabel from "./DemoLabel.astro"
+---
+<react-concepts class="not-prose">
+  <div class="demo-header"><DemoLabel /></div>
+  <div class="concept-heading"><h3>Describe la interfaz.<br />Cambia los datos.</h3><p>El componente es el mismo. <br />El resultado depende de los datos.</p></div>
+  <label class="data-input"><code>nombre</code><span aria-hidden="true">=</span><input type="text" value="Ada" maxlength="40" aria-label="Nombre del saludo" autocomplete="off" spellcheck="false" aria-describedby="name-hint" /></label>
+  <p id="name-hint" class="input-hint">Escribe tu nombre: el saludo cambia al momento.</p>
+  <div class="live-example">
+    <div class="source code-block"><div class="code-block-heading"><span class="code-technology-icon" style="--technology-icon:url('/icons/react.svg');--technology-color:#61dafb" aria-hidden="true"></span><span>React · JSX</span><button type="button" class="code-copy" aria-label="Copiar código de React · JSX" aria-live="polite"><span class="code-copy-icon" aria-hidden="true"></span><span class="code-copy-label">Copiar</span></button></div><pre is:raw><code><span class="syntax">function</span> Saludo({ nombre }) {
+  <span class="syntax">return</span> <span class="tag">&lt;h1&gt;</span>Hola, {nombre}<span class="tag">&lt;/h1&gt;</span>
+}</code></pre></div>
+    <div class="result"><span class="pane-label">En pantalla</span><p>Hola, <span data-name>Ada</span></p><span class="result-caption">Mismo componente, nuevos datos.</span></div>
+  </div>
+  <div class="composition">
+    <div><h4>Una interfaz, muchas piezas.</h4><p>Combina componentes pequeños. <br />Reutilízalos donde los necesites.</p></div>
+    <div class="component-tree" aria-label="App se compone de Header, Saludo y Footer"><code>&lt;App&gt;</code><div><code>&lt;Header /&gt;</code><code class="highlight">&lt;Saludo /&gt;</code><code>&lt;Footer /&gt;</code></div></div>
+  </div>
+  <p class="ecosystem"><strong>¿Y el resto?</strong> React se ocupa de la UI. El enrutamiento y otras necesidades se resuelven con herramientas de su ecosistema.</p>
+</react-concepts>
+<script>
+  class ReactConcepts extends HTMLElement {
+    connectedCallback() {
+      const input = this.querySelector('input')!
+      const output = this.querySelector('[data-name]')!
+      input.addEventListener('input', () => { output.textContent = input.value || '…' })
+    }
+  }
+  if (!customElements.get('react-concepts')) customElements.define('react-concepts', ReactConcepts)
+</script>
+<style>
+  react-concepts { display: block; margin: 2.5rem 0; border-top: 1px solid var(--lesson-border); color: #102c46; }
+  .demo-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; padding-top: 1rem; }
+  .input-hint { margin: -.6rem 0 1.25rem; color: #526173; font-size: .7rem; line-height: 1.5; }
+  .concept-heading { display: flex; justify-content: space-between; align-items: end; gap: 1.5rem; padding: 1.5rem 0; }
+  h3 { margin: 0; font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 750; line-height: 1.18; letter-spacing: -.04em; }
+  .concept-heading p { margin: 0; color: #526173; font-size: .85rem; line-height: 1.7; }
+  .data-input { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.25rem; font-size: .8rem; }
+  .data-input code { font-weight: 650; }
+  .data-input > span { color: #64748b; }
+  input { width: 12rem; max-width: 65%; padding: .5rem .6rem; border: 1px solid var(--lesson-border); background: #f0f9fc; border-radius: 6px; color: #0e647d; font: 600 .9rem/1.5 monospace; }
+  input:hover { border-color: var(--lesson-accent); }
+  input:focus { border-color: var(--lesson-interactive); background: #fff; }
+  .live-example { display: grid; grid-template-columns: 1.35fr 1fr; min-width: 0; }
+  .source { background: #152336; color: #e2e8f0; padding: 1.25rem; min-width: 0; border-radius: 5px 0 0 5px; }
+  .source.code-block { margin: 0; border: 0; }
+  .source .code-block-heading { margin: -1.25rem -1.25rem 0; }
+  .pane-label { display: block; font: 500 .7rem/1.4 system-ui; color: #94a3b8; }
+  pre { margin: 1.25rem 0 .5rem; padding: 0; overflow-x: auto; font: .75rem/1.9 monospace; background: transparent; }
+  .source :global(.syntax) { color: #c4b5fd; } .source :global(.tag) { color: #67e8f9; }
+  .result { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; padding: 1.25rem; border: 1px solid var(--lesson-border); border-left: 0; border-radius: 0 5px 5px 0; }
+  .result .pane-label { color: #526173; }
+  .result p { margin: 1.25rem 0; font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.2; font-weight: 700; letter-spacing: -.035em; overflow-wrap: anywhere; }
+  .result-caption { color: #526173; font-size: .65rem; }
+
+  .composition { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.75rem 0; }
+  h4 { font-weight: 700; font-size: .95rem; margin: 0 0 .5rem; letter-spacing: -.02em; }
+  .composition p { margin: 0; font-size: .8rem; line-height: 1.7; color: #526173; }
+  .component-tree { text-align: center; font-size: .65rem; }
+  .component-tree > code { display: inline-block; padding: .3rem .7rem; background: #102c46; color: white; }
+  .component-tree > div { display: flex; gap: .75rem; position: relative; margin-top: 1.1rem; border-top: 1px solid var(--lesson-border); }
+  .component-tree > div::before { content: ''; height: 1.1rem; width: 1px; background: var(--lesson-border); position: absolute; bottom: 100%; left: 50%; }
+  .component-tree > div code { padding-top: .65rem; color: #526173; }
+  .component-tree .highlight { color: #0e7490; font-weight: 700; }
+  .ecosystem { margin: 0; border-top: 1px solid var(--lesson-border); padding-top: 1rem; font-size: .8rem; line-height: 1.7; color: #526173; }
+  .ecosystem strong { color: #102c46; }
+  @media (max-width: 620px) {
+    .concept-heading { display: block; } .concept-heading p { margin-top: .8rem; } .concept-heading p br { display: none; }
+    .live-example { grid-template-columns: 1fr; } .source { border-radius: 5px 5px 0 0; } .result { border-left: 1px solid var(--lesson-border); border-top: 0; border-radius: 0 0 5px 5px; }
+    .composition { flex-direction: column; align-items: flex-start; gap: 1.5rem; } .composition p br { display: none; } .component-tree { align-self: center; }
+  }
+</style>

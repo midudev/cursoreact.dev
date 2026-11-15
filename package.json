@@ -3,11 +3,13 @@
   "type": "module",
   "version": "0.0.2",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
+    "dev": "pnpm build:demos && astro dev",
+    "start": "pnpm dev",
+    "build": "pnpm build:demos && astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "build:demos": "node scripts/build-demos.mjs",
+    "verify": "node scripts/verify-site.mjs"
   },
   "dependencies": {
     "@astrojs/check": "0.9.12",

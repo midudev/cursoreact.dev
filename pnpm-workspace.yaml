@@ -1,0 +1,6 @@
+packages:
+  - demos/*
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  rome: false

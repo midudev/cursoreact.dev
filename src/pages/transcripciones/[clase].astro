@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { CLASES } from '../../consts'
+import type { Transcript } from '../../types/transcript'
+export function getStaticPaths() { return CLASES.map(clase => ({ params: { clase: clase.slug }, props: { clase } })) }
+interface Props { clase: (typeof CLASES)[number] }
+const { clase } = Astro.props
+const sources = import.meta.glob<Transcript>('../../data/transcripts/*.json', { eager: true, import: 'default' })
+const source = sources[`../../data/transcripts/${clase.slug}.json`]
+const time = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
+---
+<Layout title={`Transcripción: ${clase.title} | Curso React`} description={`Transcripción automática completa del vídeo ${clase.title} de midudev, con marcas de tiempo.`} noindex>
+  <div class="mx-auto max-w-3xl px-5 py-10">
+    <a class="text-sm font-semibold text-sky-800" href={`/${clase.slug}`}>← Volver a la clase</a>
+    <h1 class="my-6 text-3xl font-bold tracking-tight">{clase.title}: transcripción</h1>
+    <p class="mb-4 text-slate-600">Subtítulos automáticos de YouTube, recuperados el {source.retrievedAt}. Pueden contener errores de reconocimiento; consulta el vídeo para verificar los términos técnicos.</p>
+    <a class="mb-8 inline-block rounded-lg bg-sky-800 px-4 py-2 text-sm font-semibold text-white" href={`/transcripciones/${clase.slug}.txt`} download>Descargar transcripción completa</a>
+    <div class="space-y-6">{source.segments.map(segment => <section class="grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-4" id={`t-${segment.start}`}><a class="pt-1 text-xs font-semibold tabular-nums text-sky-800" href={`${source.source}&t=${segment.start}`} target="_blank" rel="noopener noreferrer">{time(segment.start)}</a><p class="text-base leading-relaxed text-slate-700">{segment.text}</p></section>)}</div>
+  </div>
+</Layout>

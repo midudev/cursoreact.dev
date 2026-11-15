@@ -4,7 +4,9 @@
     "**/*"
   ],
   "exclude": [
-    "dist"
+    "dist",
+    "demos",
+    "public/demos"
   ],
   "extends": "astro/tsconfigs/strict"
 }

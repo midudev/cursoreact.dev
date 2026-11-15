@@ -1,0 +1,23 @@
+<script>
+  document.addEventListener('click', async event => {
+    const target = event.target as Element
+    const button = target.closest<HTMLButtonElement>('.code-copy')
+    if (!button) return
+    const code = button.closest('.code-block')?.querySelector('pre code')
+    const label = button.querySelector('.code-copy-label')
+    if (!code || !label) return
+    try {
+      await navigator.clipboard.writeText(code.textContent || '')
+      label.textContent = '¡Copiado!'
+      button.dataset.copied = 'true'
+    } catch {
+      const selection = window.getSelection()
+      const range = document.createRange()
+      range.selectNodeContents(code)
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+      label.textContent = 'Selecciona y copia'
+    }
+    setTimeout(() => { label.textContent = 'Copiar'; delete button.dataset.copied }, 2500)
+  })
+</script>

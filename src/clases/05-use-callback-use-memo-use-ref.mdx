@@ -1,6 +1,18 @@
+import ConceptCards from "../components/learning/ConceptCards.astro"
+import LearningDiagram from "../components/learning/LearningDiagram.astro"
+import LessonNote from "../components/learning/LessonNote.astro"
+
 # useCallback, useMemo y useRef
 
 En esta clase aprenderás a usar tres hooks fundamentales de React para optimizar el rendimiento de tus componentes:
+
+<ConceptCards items={[
+  { code: "useCallback", title: "Una función", text: "Conserva la referencia a una función mientras sus dependencias no cambien." },
+  { code: "useMemo", title: "Un resultado", text: "Reutiliza el resultado de un cálculo mientras sus dependencias no cambien." },
+  { code: "useRef", title: "Una referencia", text: "Guarda un valor entre renders. Cambiarlo no provoca un nuevo render." }
+]} />
+
+> Primero entiende qué cambia. Después decide qué necesitas conservar.
 
 ## useCallback
 
@@ -31,7 +43,7 @@ import { useMemo } from 'react'
 
 function ExpensiveComponent({ items }) {
   const sortedItems = useMemo(() => {
-    return items.sort((a, b) => a.name.localeCompare(b.name))
+    return [...items].sort((a, b) => a.name.localeCompare(b.name))
   }, [items])
 
   return (
@@ -55,12 +67,18 @@ function FocusInput() {
   const inputRef = useRef(null)
 
   useEffect(() => {
-    inputRef.current.focus()
+    inputRef.current?.focus()
   }, [])
 
   return <input ref={inputRef} type="text" />
 }
 ```
+
+<LessonNote title="Mide antes de memorizar" tone="idea">
+La memoización añade complejidad. Primero identifica el problema de rendimiento y comprueba que la optimización tenga efecto.
+</LessonNote>
+
+<LearningDiagram title="Tres herramientas, tres propósitos" steps={[{"title": "useMemo", "code": "useMemo(() => calcular(datos), [datos])", "text": "Guarda el resultado de un cálculo entre renders mientras no cambien sus dependencias. Úsalo cuando hayas identificado un cálculo costoso."}, {"title": "useCallback", "code": "useCallback(() => buscar(query), [query])", "text": "Conserva la referencia de una función mientras sus dependencias no cambien. Es útil cuando esa identidad afecta a componentes memoizados o a otros hooks."}, {"title": "useRef", "code": "const input = useRef(null)", "text": "Conserva un valor entre renders sin provocar un nuevo render al modificar current. También permite acceder a nodos del DOM."}]} />
 
 ## Cuándo usar cada uno
 
@@ -68,4 +86,88 @@ function FocusInput() {
 - **useMemo**: Para cálculos costosos que no necesitan recalcularse en cada render
 - **useRef**: Para acceder directamente a elementos del DOM o mantener valores que no causan re-renders
 
-Estos hooks son fundamentales para optimizar el rendimiento de aplicaciones React complejas. 
+Estos hooks son fundamentales para optimizar el rendimiento de aplicaciones React complejas.
+## El proyecto del vídeo: un buscador de películas
+
+El hilo conductor de la clase es una prueba técnica: crear un buscador con formulario, resultados en cuadrícula y ordenación. Los hooks aparecen cuando resuelven una necesidad concreta. Abre el [buscador integrado](/demos/05-react-buscador-peliculas/) y busca una película antes de seguir los pasos.
+
+Empieza con una respuesta de ejemplo para construir la interfaz sin depender de la red. Después mueve la consulta a un servicio. El componente debería trabajar con películas que tengan los campos que necesita, no con todos los nombres y convenciones de OMDb.
+
+```javascript
+export async function searchMovies(search) {
+  const params = new URLSearchParams({ s: search, apikey: PUBLIC_DEMO_KEY })
+  const response = await fetch(`https://www.omdbapi.com/?${params}`)
+  if (!response.ok) throw new Error('No se pudieron buscar películas')
+  const data = await response.json()
+  if (data.Response === 'False') return []
+  return (data.Search ?? []).map(movie => ({
+    id: movie.imdbID,
+    title: movie.Title,
+    year: movie.Year,
+    poster: movie.Poster
+  }))
+}
+```
+
+`PUBLIC_DEMO_KEY` representa una clave pública permitida para el ejemplo, no una clave privada que debas incrustar en el cliente. Mantener esta traducción junto al servicio evita que un cambio de contrato de la API se propague a todos los componentes.
+
+## Formularios: estado controlado y FormData
+
+Un input controlado guarda el texto en React y permite validarlo mientras escribes. Si solo necesitas los datos al enviar, `FormData` permite leer todos los campos con nombre sin crear una referencia para cada uno.
+
+```jsx
+function SearchForm({ onSearch }) {
+  function handleSubmit(event) {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const search = String(data.get('search') || '').trim()
+    if (search.length < 3) return
+    onSearch(search)
+  }
+  return <form onSubmit={handleSubmit}>
+    <label htmlFor="movie-search">Película</label>
+    <input id="movie-search" name="search" required minLength={3} />
+    <button>Buscar</button>
+  </form>
+}
+```
+
+No consultes el DOM con `document.querySelector` cada vez que necesitas un valor. Escoge una de estas estrategias según la interacción. El vídeo compara refs y formularios controlados para mostrar qué información necesita provocar un render.
+
+## Evita repetir la misma búsqueda con useRef
+
+Una referencia recuerda un valor sin renderizar al cambiar. Puedes guardar la última consulta para descartar envíos repetidos. Actualiza esa referencia en el momento adecuado: si la petición falla y quieres permitir reintento, no bloquees para siempre el mismo texto.
+
+```jsx
+const lastSearch = useRef(null)
+
+const getMovies = useCallback(async search => {
+  if (lastSearch.current === search) return
+  lastSearch.current = search
+  try {
+    const nextMovies = await searchMovies(search)
+    setMovies(nextMovies)
+  } catch (error) {
+    lastSearch.current = null
+    setError(error.message)
+  }
+}, [])
+```
+
+El fragmento omite la carga para centrarse en la referencia. Una versión completa representa carga y error y resuelve respuestas fuera de orden. `useCallback` conserva la identidad de la función; no evita que su cuerpo se ejecute cuando la llamas.
+
+## Ordenar resultados y usar debounce
+
+La ordenación es un valor derivado. Usa una copia antes de `sort` y conserva el cálculo con `useMemo` cuando tenga sentido. El criterio y las películas son dependencias del resultado. No uses un array vacío para silenciar que el cálculo depende de datos que cambian.
+
+Si buscas al escribir, el debounce espera una pausa antes de consultar. Una implementación creada de nuevo en cada render pierde su temporizador anterior: conserva su identidad y cancela el trabajo pendiente al desmontar. La clase termina construyendo esta idea paso a paso.
+
+<LessonNote title="Conservar una referencia no significa congelar los datos" tone="warning">
+Una función memoizada utiliza los valores del render que la creó. Si lee una prop o un estado, inclúyelo en sus dependencias o pásalo como argumento. Omitir dependencias puede dejar una función trabajando con datos antiguos.
+</LessonNote>
+
+## Comprueba la solución completa
+
+Busca el mismo texto dos veces, prueba un término sin resultados, activa y desactiva la ordenación y escribe rápidamente varias consultas. La última búsqueda debe corresponder a lo que ves. Comprueba también que un fallo permita reintentar y que el formulario funcione con Enter.
+
+**Reto:** añade cancelación de peticiones y un selector para ordenar por año o por título. Explica qué valores has guardado en estado, cuáles en refs y cuáles son cálculos derivados.

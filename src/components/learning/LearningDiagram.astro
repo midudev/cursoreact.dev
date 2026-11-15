@@ -1,0 +1,57 @@
+---
+import DemoLabel from "./DemoLabel.astro"
+interface Props { title: string; steps: { title: string; code: string; text: string }[] }
+const { title, steps } = Astro.props
+---
+<learning-diagram class="not-prose">
+  <div class="diagram-demo"><DemoLabel /></div>
+  <div class="diagram-heading"><img src="/icons/react.svg" width="24" height="24" alt="" /><strong>{title}</strong></div>
+  <div class="diagram-path" role="group" aria-label="Pasos del proceso">
+    {steps.map((step, i) => <button type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-step={i}><span class="step-number">{i + 1}</span><span>{step.title}</span><span class="step-arrow" aria-hidden="true">→</span></button>)}
+  </div>
+  <div class="diagram-track" aria-hidden="true"><span style={`--progress: ${100 / steps.length}%`}></span></div>
+  <div class="diagram-panels" aria-live="polite">{steps.map((step, i) => <div data-panel={i} hidden={i !== 0}><code>{step.code}</code><p>{step.text}</p></div>)}</div>
+  <div class="diagram-footer"><span>Explora cada paso</span><button type="button" data-next>Siguiente paso →</button></div>
+</learning-diagram>
+<script>
+  class LearningDiagram extends HTMLElement {
+    connectedCallback() {
+      const buttons = [...this.querySelectorAll<HTMLButtonElement>('[data-step]')]
+      const panels = [...this.querySelectorAll<HTMLElement>('[data-panel]')]
+      const select = (index: number) => {
+        buttons.forEach((b, i) => b.setAttribute('aria-pressed', String(index === i)))
+        panels.forEach((p, i) => { p.hidden = index !== i })
+        this.querySelector<HTMLElement>('.diagram-track span')?.style.setProperty('--progress', `${(index + 1) / buttons.length * 100}%`)
+      }
+      buttons.forEach((b, i) => b.addEventListener('click', () => select(i)))
+      this.querySelector('[data-next]')?.addEventListener('click', () => select((buttons.findIndex(b => b.getAttribute('aria-pressed') === 'true') + 1) % buttons.length))
+    }
+  }
+  if (!customElements.get('learning-diagram')) customElements.define('learning-diagram', LearningDiagram)
+</script>
+<style>
+  learning-diagram { display: block; margin: 2.5rem 0; background: #f0f9ff; border: 1px solid var(--lesson-border); border-radius: 16px; overflow: hidden; }
+  .diagram-demo { padding: 1rem 1.25rem 0; }
+  .diagram-heading { display: flex; align-items: center; gap: .65rem; padding: 1.1rem 1.25rem; color: #0c4a6e; font-size: .95rem; }
+  .diagram-heading img { filter: invert(60%) sepia(90%) saturate(600%) hue-rotate(145deg); }
+  .diagram-track { height: 4px; margin: 1.25rem 1.25rem 0; background: #d8eaf4; border-radius: 4px; overflow: hidden; }
+  .diagram-track span { display: block; width: var(--progress); height: 100%; background: #0891b2; transition: width .4s ease; }
+  .diagram-path button:focus-visible { outline: 3px solid #8b5cf6; outline-offset: 3px; }
+  .diagram-path { display: grid; grid-template-columns: repeat(auto-fit,minmax(100px,1fr)); gap: .5rem; padding: 0 1.25rem; }
+  .diagram-path button { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: .6rem; text-align: left; padding: .9rem; border-radius: 10px; border: 1px solid var(--lesson-border); background: white; color: #475569; font-size: .85rem; font-weight: 650; cursor: pointer; }
+  .step-number { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 7px; background: #e2e8f0; color: #334155; font: 700 .8rem system-ui; }
+  .diagram-path button[aria-pressed='true'] { background: #0c4a6e; color: white; border-color: #0c4a6e; }
+  [aria-pressed='true'] .step-number { background: #38bdf8; color: #082f49; animation: pop .3s ease-out; }
+  .step-arrow { position: absolute; right: .75rem; top: 1rem; opacity: 1; }
+  .diagram-path button:last-child .step-arrow { display: none; }
+  .diagram-panels { padding: 1.25rem; min-height: 130px; }
+  .diagram-panels [data-panel]:not([hidden]) { animation: appear .25s ease-out; }
+  code { display: block; color: #6d28d9; font-size: .9rem; font-weight: 600; overflow-wrap: anywhere; }
+  p { margin: .6rem 0 0; font-size: .9rem; line-height: 1.65; color: #334155; }
+  .diagram-footer { display: flex; align-items: center; justify-content: space-between; padding: .75rem 1.25rem; background: #e9f2fb; font-size: .75rem; color: #475569; }
+  .diagram-footer button { color: #075985; font-weight: 650; cursor: pointer; }
+  @keyframes pop { from { transform: scale(.75); } to { transform: scale(1); } }
+  @keyframes appear { from { opacity: .4; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  @media (max-width: 480px) { .diagram-path { padding: 0 .75rem; gap: .3rem; } .diagram-path button { padding: .6rem; font-size: .75rem; } .step-arrow { display: none; } }
+</style>

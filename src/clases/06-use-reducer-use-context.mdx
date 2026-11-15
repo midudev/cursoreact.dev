@@ -1,0 +1,105 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## Una tienda con una sola fuente de la verdad
+
+En esta clase construimos una tienda con filtros y carrito. El recorrido del vídeo empieza listando productos, añade filtros por categoría y precio y termina separando las operaciones del carrito en un reducer. El objetivo es entender **dónde vive el estado**, cómo lo leen los componentes y cómo lo actualizamos sin duplicarlo.
+
+Abre la [demo de la tienda](/demos/06-shopping-cart/) y prueba a añadir dos veces el mismo producto, eliminarlo y cambiar el precio mínimo. Son comportamientos distintos: los filtros afectan al catálogo visible; el carrito conserva los productos que has elegido.
+
+## Primero, deriva los productos visibles
+
+Guarda en el estado las decisiones del usuario: categoría y precio mínimo. La lista filtrada puede calcularse a partir de esos valores y del catálogo. Guardar también esa lista como estado obliga a sincronizar dos representaciones de la misma información.
+
+```jsx
+const [filters, setFilters] = useState({ category: 'all', minPrice: 0 })
+
+const filteredProducts = products.filter(product => {
+  const matchesCategory = filters.category === 'all'
+    || product.category === filters.category
+  return matchesCategory && product.price >= filters.minPrice
+})
+```
+
+El control de categoría actualiza `filters.category`; el rango de precio actualiza `filters.minPrice`. Usa la forma funcional si la actualización depende del objeto anterior: `setFilters(previous => ({ ...previous, minPrice }))`.
+
+## Identifica el prop drilling
+
+Pasar props explícitas es una buena opción mientras el recorrido sea corto. El problema aparece cuando varios componentes intermedios reciben datos que no utilizan, solo para reenviarlos. En el vídeo se introduce Context para dar acceso a los filtros y al carrito desde lugares separados del árbol.
+
+<LessonNote title="Context distribuye; el estado recuerda" tone="idea">
+Context permite leer un valor desde componentes descendientes. El estado sigue viviendo en useState, useReducer u otro almacén. Crear un contexto no convierte por sí solo los datos en reactivos.
+</LessonNote>
+
+```jsx
+import { createContext, useContext, useState } from 'react'
+
+const FiltersContext = createContext(null)
+
+export function FiltersProvider({ children }) {
+  const [filters, setFilters] = useState({ category: 'all', minPrice: 0 })
+  return (
+    <FiltersContext.Provider value={{ filters, setFilters }}>
+      {children}
+    </FiltersContext.Provider>
+  )
+}
+
+export function useFilters() {
+  const context = useContext(FiltersContext)
+  if (!context) throw new Error('Falta FiltersProvider')
+  return context
+}
+```
+
+Coloca el provider por encima de los componentes que necesitan compartir esos datos. Dos providers separados representan dos estados independientes: es la causa del problema de las «dos fuentes de la verdad» que se analiza en la clase.
+
+## Modela el carrito como acciones
+
+El carrito tiene operaciones reconocibles: añadir, eliminar y vaciar. En lugar de repartir sus reglas entre componentes, una función reducer recibe el estado anterior y una acción, y devuelve el siguiente estado.
+
+```jsx
+function cartReducer(cart, action) {
+  switch (action.type) {
+    case 'add': {
+      const exists = cart.some(item => item.id === action.product.id)
+      return exists
+        ? cart.map(item => item.id === action.product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item)
+        : [...cart, { ...action.product, quantity: 1 }]
+    }
+    case 'remove':
+      return cart.filter(item => item.id !== action.id)
+    case 'clear':
+      return []
+    default:
+      return cart
+  }
+}
+
+const [cart, dispatch] = useReducer(cartReducer, [])
+```
+
+La interfaz solo necesita expresar una intención: `dispatch({ type: 'add', product })`. El reducer decide cómo cambiar la cantidad o insertar una nueva línea. Evita modificar el array recibido: una nueva referencia permite representar correctamente la actualización.
+
+<LearningDiagram title="Del clic al carrito actualizado" steps={[
+  { title: 'Intención', code: "dispatch({ type: 'add', product })", text: 'El botón describe qué ha ocurrido. No necesita conocer las reglas para incrementar cantidades.' },
+  { title: 'Regla', code: 'nextCart = cartReducer(cart, action)', text: 'El reducer calcula el estado siguiente sin modificar el anterior.' },
+  { title: 'Pantalla', code: 'cart.map(item => <CartItem />)', text: 'Context distribuye el nuevo valor y los componentes muestran las cantidades actualizadas.' }
+]} />
+
+## Persistencia y accesibilidad
+
+Puedes guardar el carrito en `localStorage` y recuperarlo al iniciar. Como ampliación respecto al ejemplo original, mantén el reducer puro y realiza la persistencia en un efecto. La lectura inicial debe contemplar JSON inválido o almacenamiento no disponible. En un entorno con servidor, no leas `window` durante el render del servidor.
+
+Para los filtros, `useId` ayuda a relacionar un `label` con su control. No lo uses como identificador de productos: esos IDs deben proceder de los datos y ser estables.
+
+## Comprueba lo aprendido
+
+1. Añade un producto dos veces: debe existir una línea con cantidad dos.
+2. Cambia los filtros: el contenido del carrito no debe desaparecer.
+3. Elimina un producto: los demás conservan sus cantidades.
+4. Recarga la página y comprueba la persistencia.
+
+**Reto:** añade una acción para reducir una unidad. Decide explícitamente qué ocurre cuando la cantidad llega a cero. Calcula el importe total a partir del carrito, sin guardarlo como un estado independiente.

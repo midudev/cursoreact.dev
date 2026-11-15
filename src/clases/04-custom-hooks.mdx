@@ -1,6 +1,11 @@
+import LearningDiagram from "../components/learning/LearningDiagram.astro"
+import LessonNote from "../components/learning/LessonNote.astro"
+
 En la clase anterior, vimos dos de los hooks más importantes: `useState` para manejar el estado local de nuestros componentes y `useEffect` para sincronizar el estado con efectos secundarios (como peticiones asíncronas).
 
 Hoy vamos a abordar un concepto fundamental que te va a diferenciar en las pruebas técnicas y te va a permitir escribir código React mucho más limpio y reutilizable: los **Custom Hooks** (o ganchos personalizados).
+
+> Reutiliza la lógica, deja que cada componente cuente su propia historia visual.
 
 ## El Problema: Lógica Repetida y Componentes Enredados
 
@@ -274,6 +279,12 @@ export function App () {
 
 ¡Mira qué limpio ha quedado el componente `App`! Solo se preocupa de renderizar los datos y manejar las interacciones del usuario. La lógica de obtener y actualizar el hecho y la imagen está totalmente encapsulada en los custom hooks.
 
+<LessonNote title="Compartir lógica no es compartir estado" tone="idea">
+Dos componentes que llaman al mismo custom hook tienen estados independientes, salvo que el hook use explícitamente un almacén o contexto compartido.
+</LessonNote>
+
+<LearningDiagram title="Reutiliza la lógica, conserva la independencia" steps={[{"title": "Extraer", "code": "function useCatFact()", "text": "Agrupa estado y efectos relacionados en un hook. El nombre empieza por use y se llama en el nivel superior del componente."}, {"title": "Devolver", "code": "return { fact, refreshFact }", "text": "Expón los datos y acciones que necesita la interfaz. Así el componente puede centrarse en cómo mostrarlos."}, {"title": "Reutilizar", "code": "const { fact } = useCatFact()", "text": "Cada llamada al hook tiene su propio estado. Reutilizar un hook no crea automáticamente un estado compartido."}]} />
+
 ## Buenas Prácticas con Custom Hooks
 
 1.  **Nombrar correctamente:** Siempre empieza con `use`. Esto permite a React (y a las herramientas de linting) entender que son hooks y aplicar las reglas correspondientes.
@@ -323,5 +334,3 @@ test('app shows random fact and image', async ({ page }) => {
 Este test verifica que, después de cargar la página, aparece un párrafo con texto (el hecho) y una imagen con una URL válida que comienza con el prefijo esperado. No necesita saber *cómo* React obtiene el hecho o la imagen, solo verifica el resultado final visible para el usuario.
 
 Para correr este test, después de instalar Playwright (`npm init playwright@latest` y seguir los pasos), usarías el comando `npx playwright test`.
-
-*(Recuerda revisar el repositorio de GitHub [midududev/aprendiendo-react](https://github.com/midududev/aprendiendo-react) para ver el código de este proyecto y de las clases anteriores.)*

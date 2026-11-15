@@ -1,0 +1,123 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## React 19 a través de problemas concretos
+
+El taller explora metadatos, recursos, refs, `use`, contextos y formularios con Actions. En lugar de memorizar APIs, relacionaremos cada novedad con la tarea que simplifica. El vídeo corresponde al momento de presentación de React 19: los ejemplos de estos apuntes utilizan los nombres estables de las APIs.
+
+La [demo de React 19](/demos/15-react-19/) combina `useActionState` y `useOptimistic`. Escribe un mensaje: aparece de inmediato y después se confirma tras una espera simulada. No envía datos a un servidor.
+
+## Metadatos desde componentes
+
+Un componente puede describir un `title` o un `meta` y React se encarga de colocarlos en el documento. Esto permite que una página declare sus metadatos cerca de su contenido.
+
+```jsx
+function ProductPage({ product }) {
+  return (
+    <>
+      <title>{product.name} | Tienda</title>
+      <meta name="description" content={product.description} />
+      <h1>{product.name}</h1>
+    </>
+  )
+}
+```
+
+Coordina qué componente es propietario del título para no declarar varios títulos competidores. El renderizado de metadatos no sustituye una estrategia de contenido, URLs o respuesta del servidor.
+
+## Recursos y refs
+
+El vídeo muestra carga de estilos y las APIs `preload`, `preinit`, `prefetchDNS` y `preconnect`. Son indicaciones al navegador, no una lista de optimizaciones que debas activar sin medir. Precargar algo que no se utiliza puede competir con recursos necesarios.
+
+React 19 también permite recibir `ref` como prop en componentes de función. En código destinado a versiones anteriores verás `forwardRef`; comprueba la versión de React antes de cambiar la firma de un componente compartido.
+
+```jsx
+function SearchInput({ ref, ...props }) {
+  return <input {...props} ref={ref} />
+}
+```
+
+## Leer promesas y contextos con use
+
+`use` puede leer una promesa o un contexto. Cuando la promesa está pendiente, se integra con `Suspense`; un rechazo requiere un límite de error. La promesa debe ser estable y proceder de un mecanismo adecuado de carga o caché, no crearse de nuevo en cada render.
+
+```jsx
+import { use, Suspense } from 'react'
+
+function Message({ messagePromise }) {
+  const message = use(messagePromise)
+  return <p>{message.text}</p>
+}
+
+function Screen({ messagePromise }) {
+  return (
+    <Suspense fallback={<p>Cargando mensaje…</p>}>
+      <Message messagePromise={messagePromise} />
+    </Suspense>
+  )
+}
+```
+
+A diferencia de los hooks habituales, `use` admite lectura dentro de condiciones y bucles, aunque sigue utilizándose dentro de un componente o hook. Para contextos, React 19 permite usar el propio contexto como provider: `<ThemeContext value={theme}>…</ThemeContext>`.
+
+<LessonNote title="React Compiler es una herramienta aparte" tone="warning">
+Instalar React 19 no activa automáticamente el compilador. Su configuración y compatibilidad deben revisarse por separado. No borres optimizaciones de un proyecto dando por hecho que ya se han sustituido.
+</LessonNote>
+
+## Actions y formularios
+
+Una función en la prop `action` de un formulario recibe su `FormData`. Con `useActionState` puedes asociar el resultado de la operación y su estado pendiente al envío. La función recibe primero el estado anterior y después los datos del formulario.
+
+```jsx
+import { useActionState } from 'react'
+
+async function saveName(previousState, formData) {
+  const name = String(formData.get('name') || '').trim()
+  if (!name) return { message: 'Escribe un nombre' }
+  await new Promise(resolve => setTimeout(resolve, 800))
+  return { message: `Guardado: ${name}` }
+}
+
+function NameForm() {
+  const [state, action, pending] = useActionState(saveName, { message: '' })
+  return (
+    <form action={action}>
+      <label htmlFor="name">Nombre</label>
+      <input id="name" name="name" required />
+      <button disabled={pending}>{pending ? 'Guardando…' : 'Guardar'}</button>
+      <p role="status">{state.message}</p>
+    </form>
+  )
+}
+```
+
+Una Action ejecutada en el cliente no se convierte automáticamente en una función del servidor. Para acceder a una base de datos o usar secretos necesitas una arquitectura de backend o un framework que soporte ese flujo.
+
+## useFormStatus vive dentro del formulario
+
+`useFormStatus` se importa de `react-dom`. Un componente descendiente del formulario puede consultar `pending` sin recibir esa prop por toda la jerarquía. No lo pongas en el mismo componente que crea el formulario esperando que lea un formulario que todavía no es su antecesor.
+
+```jsx
+import { useFormStatus } from 'react-dom'
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return <button disabled={pending}>{pending ? 'Enviando…' : 'Enviar'}</button>
+}
+```
+
+## Una interfaz optimista
+
+`useOptimistic` permite representar un estado provisional mientras una Action está pendiente. En la demo, el mensaje aparece antes de completar la espera. El estado confirmado sigue siendo la fuente definitiva.
+
+<LearningDiagram title="Responder rápido sin confundir el resultado" steps={[
+  { title: 'Enviar', code: '<form action={sendMessage}>', text: 'La Action lee y valida los datos. El formulario puede informar de que la operación está pendiente.' },
+  { title: 'Anticipar', code: 'addOptimistic(message)', text: 'Dentro de la Action añades temporalmente el mensaje para que la interfaz responda al instante.' },
+  { title: 'Confirmar', code: 'return confirmedMessages', text: 'La operación devuelve el estado confirmado. Si falla, debes representar el error y reconciliar el resultado.' }
+]} />
+
+## Práctica final
+
+Añade a la demo una operación que falle de forma controlada. El mensaje pendiente debe distinguirse del confirmado y el error debe ser visible. Prueba además un envío vacío y dos envíos consecutivos. Explica qué parte es estado provisional, qué parte es resultado de la Action y dónde guardarías los mensajes en una aplicación real.
+
+Puedes contrastar los contratos estables en las referencias de [useActionState](https://react.dev/reference/react/useActionState), [useFormStatus](https://react.dev/reference/react-dom/hooks/useFormStatus), [use](https://react.dev/reference/react/use) y [useOptimistic](https://react.dev/reference/react/useOptimistic).

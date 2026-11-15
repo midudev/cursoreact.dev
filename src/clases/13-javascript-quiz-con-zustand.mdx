@@ -1,0 +1,103 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## Un quiz con estado compartido pequeño y explícito
+
+En esta clase creamos un cuestionario de JavaScript con Zustand, TypeScript y Material UI. El vídeo comienza comparando formas de gestionar estado, construye la pantalla del juego y añade selección de respuestas, puntuación, navegación, persistencia y reinicio.
+
+Abre el [quiz integrado](/demos/13-javascript-quiz-con-zustand/) y responde unas preguntas. Recarga después: la partida se conserva en este navegador. La colección de preguntas se sirve desde el propio proyecto.
+
+## Modela las preguntas y las acciones
+
+El estado global necesita la colección de preguntas y el índice actual. Una pregunta contiene las respuestas posibles, cuál es correcta y, cuando el usuario contesta, su selección. La puntuación puede derivarse de esas respuestas en lugar de guardarse como otro contador.
+
+```typescript
+interface Question {
+  id: number
+  question: string
+  answers: string[]
+  correctAnswer: number
+  userSelectedAnswer?: number
+}
+interface QuizState {
+  questions: Question[]
+  currentQuestion: number
+  selectAnswer: (id: number, answerIndex: number) => void
+  reset: () => void
+}
+```
+
+Usa `undefined` para distinguir «sin responder» de la respuesta con índice cero. Comprobar simplemente `if (userSelectedAnswer)` daría un resultado incorrecto para la primera opción.
+
+## Crea la store y actualiza de forma inmutable
+
+`create` produce un hook que lee la store. `set` permite actualizarla y `get` consultar el valor actual dentro de una acción. No necesitas introducir un provider para este ejemplo.
+
+```typescript
+import { create } from 'zustand'
+
+export const useQuiz = create<QuizState>()(set => ({
+  questions: [],
+  currentQuestion: 0,
+  selectAnswer: (id, answerIndex) => set(state => ({
+    questions: state.questions.map(question => {
+      if (question.id !== id || question.userSelectedAnswer !== undefined) {
+        return question
+      }
+      return { ...question, userSelectedAnswer: answerIndex }
+    })
+  })),
+  reset: () => set({ questions: [], currentQuestion: 0 })
+}))
+```
+
+Este fragmento bloquea una segunda respuesta a la misma pregunta. Si tu diseño permite corregir respuestas, cambia la regla de forma explícita. También conviene validar que `answerIndex` esté dentro de la lista antes de guardarlo.
+
+## Suscríbete solo a lo que necesitas
+
+Un selector evita que cada componente lea toda la store. El contador puede leer la pregunta actual; la lista de opciones necesita la pregunta visible y la acción de responder.
+
+```tsx
+const currentQuestion = useQuestionsStore(state => state.currentQuestion)
+const questions = useQuestionsStore(state => state.questions)
+const selectAnswer = useQuestionsStore(state => state.selectAnswer)
+const question = questions[currentQuestion]
+```
+
+El estado compartido no obliga a que todos los componentes tengan la misma suscripción. Si devuelves objetos nuevos desde selectores, presta atención a cómo se comparan en la versión de Zustand que estés utilizando.
+
+<LearningDiagram title="Una respuesta recorre toda la aplicación" steps={[
+  { title: 'Elegir', code: 'selectAnswer(question.id, index)', text: 'El botón envía la identidad de la pregunta y el índice elegido, sin recalcular toda la partida.' },
+  { title: 'Guardar', code: '{ ...question, userSelectedAnswer: index }', text: 'La store actualiza la pregunta sin modificar el objeto anterior.' },
+  { title: 'Mostrar', code: 'selected === correctAnswer', text: 'Los componentes derivan aciertos, colores y mensajes de la respuesta guardada.' }
+]} />
+
+## Colores que expliquen el resultado
+
+Después de responder, diferencia la opción correcta y la elegida. Añade texto o un icono con una etiqueta comprensible: el color por sí solo no debería ser la única forma de saber si has acertado.
+
+La puntuación sale de recorrer las preguntas. Cuenta como acertadas aquellas cuya selección coincide con `correctAnswer` y como no respondidas las que mantienen `userSelectedAnswer === undefined`. No necesitas sincronizar tres contadores al cambiar una respuesta.
+
+<LessonNote title="Una sola fuente para la puntuación" tone="idea">
+Guarda las respuestas. Calcula aciertos y errores a partir de ellas. Así reiniciar, persistir o navegar no obliga a mantener un segundo estado equivalente.
+</LessonNote>
+
+## Persistencia y navegación
+
+El middleware `persist` guarda la store en almacenamiento local. Dale una clave propia para no colisionar con otras demos del mismo dominio. Decide qué parte persistir y cómo migrar datos si cambia el modelo de preguntas.
+
+```typescript
+import { persist } from 'zustand/middleware'
+
+const useExample = create<{ score: number }>()(
+  persist(() => ({ score: 0 }), { name: 'curso-react-quiz-example' })
+)
+```
+
+Para avanzar, comprueba que el nuevo índice no supere la última pregunta. Para retroceder, impide valores negativos. Reiniciar debe limpiar tanto las respuestas como la posición. Las DevTools permiten inspeccionar estas transiciones y dar nombres legibles a las acciones.
+
+## Reto
+
+Añade un resumen final con aciertos, errores y preguntas pendientes. Prueba responder la primera opción, recargar a mitad de partida y reiniciar al terminar. Como ampliación, sustituye la mezcla con `sort` aleatorio por Fisher–Yates y conserva las preguntas elegidas durante toda la partida.
+
+La [guía de persistencia de Zustand](https://zustand.docs.pmnd.rs/reference/integrations/persisting-store-data) amplía las opciones de almacenamiento y migración.

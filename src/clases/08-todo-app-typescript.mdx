@@ -1,0 +1,107 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## Una aplicación de tareas con contratos claros
+
+En esta clase usamos TypeScript para crear una Todo App. El vídeo recorre los tipos de props, la extracción de declaraciones, el borrado y completado de tareas, los filtros y el formulario para crear nuevas. El objetivo no es añadir anotaciones a todo: es expresar qué datos acepta cada componente y qué operaciones puede solicitar.
+
+Prueba la [aplicación de tareas](/demos/08-todo-app-typescript/) antes de empezar. Añade una tarea, complétala, filtra las completadas y bórrala. Esos comportamientos se convertirán en los contratos de los componentes.
+
+## Define el modelo de datos
+
+Una tarea necesita un identificador estable, un título y un indicador de completado. El ID representa la identidad; la posición en el array cambia al filtrar o borrar.
+
+```typescript
+export interface Todo {
+  id: string
+  title: string
+  completed: boolean
+}
+
+export type TodoId = Todo['id']
+export type Filter = 'all' | 'active' | 'completed'
+```
+
+`interface` describe bien la forma de una tarea; `type` también podría hacerlo y resulta útil para uniones como `Filter`. Evita ampliar el debate a una regla universal: lo importante es que el modelo exprese los estados válidos del ejercicio.
+
+## Las props describen una colaboración
+
+El componente de una tarea recibe datos y callbacks. No necesita saber dónde se guarda la lista completa. Tipar el callback documenta lo que tiene que enviar al componente propietario del estado.
+
+```tsx
+interface TodoItemProps {
+  todo: Todo
+  onRemove: (id: Todo['id']) => void
+  onToggle: (id: Todo['id']) => void
+}
+
+function TodoItem({ todo, onRemove, onToggle }: TodoItemProps) {
+  return (
+    <li>
+      <label>
+        <input type="checkbox" checked={todo.completed}
+          onChange={() => onToggle(todo.id)} />
+        {todo.title}
+      </label>
+      <button onClick={() => onRemove(todo.id)}>Eliminar {todo.title}</button>
+    </li>
+  )
+}
+```
+
+Usar `React.FC` es una opción, no un requisito. Una función con props tipadas ya permite inferir su resultado. Mantén los tipos compartidos en un archivo dedicado cuando varios componentes los utilicen.
+
+<LearningDiagram title="Los tipos conectan los componentes" steps={[
+  { title: 'Modelo', code: 'Todo = { id, title, completed }', text: 'El modelo define lo que existe en una tarea y evita acceder a propiedades que no forman parte de ella.' },
+  { title: 'Props', code: 'onRemove: (id: Todo["id"]) => void', text: 'El componente hijo pide una operación concreta con un argumento conocido.' },
+  { title: 'Estado', code: 'setTodos(previous => ...)', text: 'El componente propietario actualiza la colección y React vuelve a pasar los datos a los hijos.' }
+]} />
+
+## Actualiza sin mutar
+
+Para eliminar, conserva las tareas cuyo ID no coincida. Para completar, crea un nuevo objeto solo para la tarea afectada. Ambas operaciones producen un array nuevo y mantienen intacto el estado anterior.
+
+```tsx
+const [todos, setTodos] = useState<Todo[]>([])
+
+function removeTodo(id: Todo['id']) {
+  setTodos(previous => previous.filter(todo => todo.id !== id))
+}
+
+function toggleTodo(id: Todo['id']) {
+  setTodos(previous => previous.map(todo => todo.id === id
+    ? { ...todo, completed: !todo.completed }
+    : todo))
+}
+```
+
+No generes el ID durante cada render ni uses el índice como `key`. Genéralo al crear la tarea y consérvalo durante toda su vida.
+
+## Filtra y calcula los contadores
+
+Guarda el filtro seleccionado, pero deriva la lista visible y las cantidades. La fuente de verdad sigue siendo `todos`.
+
+```typescript
+const visibleTodos = todos.filter(todo => {
+  if (filter === 'active') return !todo.completed
+  if (filter === 'completed') return todo.completed
+  return true
+})
+const activeCount = todos.filter(todo => !todo.completed).length
+```
+
+Para borrar todas las completadas, conserva únicamente las activas. Evita implementar una lista separada para cada filtro: después tendrías que mantenerlas sincronizadas al editar cualquier tarea.
+
+<LessonNote title="TypeScript no valida datos externos" tone="warning">
+Un tipo ayuda durante el desarrollo, pero no comprueba automáticamente lo que llega de una API o de localStorage. Si recuperas tareas de fuera de la aplicación, valida su estructura antes de usarlas.
+</LessonNote>
+
+## Crear una tarea y añadir animación
+
+El formulario recoge un título, elimina espacios sobrantes y rechaza el string vacío. Puedes usar un input controlado o leer `FormData` al enviar. Crea el ID con `crypto.randomUUID()` y añade `{ id, title, completed: false }` mediante una actualización funcional.
+
+La demo incorpora animación de la lista. Úsala para explicar inserciones y borrados; respeta la preferencia de movimiento reducido y no retrases la operación para que se vea el efecto.
+
+## Reto y comprobación
+
+Añade edición de títulos manteniendo el ID original. Comprueba que editar una tarea filtrada no cambia otra, que el contador se actualiza al completar y que un título vacío no se guarda. Después implementa persistencia local y una carga inicial tolerante a datos inválidos.

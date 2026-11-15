@@ -25,30 +25,41 @@ Curso para aprender **React** basado en proyectos.
 - 11: [Prueba técnica de React con TypeScript](https://www.youtube.com/watch?v=mNJOWXc83Y4)
 - 12: [React Query + Paginación + Infinite Scroll](https://www.youtube.com/watch?v=WKfVjQUa6nE)
 - 13: [JavaScript Quiz con Zustand + TypeScript desde cero](https://www.youtube.com/watch?v=p2wF2wRjcN0)
-- 14: Hacker News con TypeScript + SWR - Pendiente de subir
+- 14: [Novedades de React 19: Actions, hooks y API use](https://www.youtube.com/watch?v=OG6YGMF0UPM)
 
 ## ⌨️ Proyectos de React con código
 
 | Número | Proyecto | Código | Web |
 | --- | --- | --- | --- |
-| `01` | Twitter Follow Card | [Ver](projects/01-twitter-follow-card/) | [Visitar](https://midu-react-01.surge.sh) |
-| `02` | Tic Tac Toe | [Ver](projects/02-tic-tac-toe/) | [Visitar](https://midu-react-02.surge.sh) |
-| `03` | Mouse Follower | [Ver](projects/03-mouse-follower) | [Visitar](https://midu-react-03.surge.sh) |
-| `04` | Prueba técnica con Promesas, fetching y testing E2E | [Ver](projects/04-react-prueba-tecnica) | [Visitar](https://midu-react-04.surge.sh) |
-| `05` | Prueba técnica con formularios, buscador utilizando una API | [Ver](projects/05-react-buscador-peliculas) | [Visitar](https://midu-react-05.surge.sh) |
-| `06` | Creación de un ecommerce con carrito de compras | [Ver](projects/06-shopping-cart) | [Visitar](https://midu-react-06.surge.sh) |
-| `07` | Creación de un React Router desde cero | [Ver](projects/07-midu-router) | [Visitar](https://midu-react-07.surge.sh) |
-| `08` | Todo App con TypeScript y animaciones | [Ver](projects/08-todo-app-typescript) | [Visitar](https://midu-react-08.surge.sh) |
-| `09` | Crear un Google Translate con ChatGPT y TypeScript | [Ver](projects/09-google-translate-clone/) | [Visitar](https://midu-react-09.surge.sh) |
-| `10` | Crear un CRUD con Redux Toolkit y TypeScript | [Ver](projects/10-crud-redux/) | [Visitar](https://midu-react-10.surge.sh) |
-| `11` | Prueba Técnica con TypeScript y React | [Ver](projects/11-typescript-prueba-tecnica/) | [Visitar](https://midu-react-11.surge.sh) |
-| `11b` | Prueba Técnica con TypeScript y React con React Query | [Ver](projects/11b-typescript-prueba-tecnica-with-react-query/) | [Visitar](https://midu-react-11.surge.sh) |
-| `12` | Sistema de comentarios con React Query | [Ver](projects/12-comments-react-query) | [Visitar](https://midu-react-12.surge.sh) |
-| `13` | JavaScript Quiz con Zustand y TypeScript | [Ver](projects/13-javascript-quiz-con-zustand/) | [Visitar](https://midu-react-13.surge.sh) |
-| `14` | Hacker News con TypeScript y SWR | [Ver](projects/14-hacker-news-prueba-tecnica) | [Visitar](https://midu-react-14.surge.sh) |
+| `01` | Twitter Follow Card | [Ver](demos/01-twitter-follow-card/) | [Visitar](https://cursoreact.dev/demos/01-twitter-follow-card/) |
+| `02` | Tic Tac Toe | [Ver](demos/02-tic-tac-toe/) | [Visitar](https://cursoreact.dev/demos/02-tic-tac-toe/) |
+| `03` | Mouse Follower | [Ver](demos/03-mouse-follower) | [Visitar](https://cursoreact.dev/demos/03-mouse-follower/) |
+| `04` | Prueba técnica con Promesas, fetching y testing E2E | [Ver](demos/04-react-prueba-tecnica) | [Visitar](https://cursoreact.dev/demos/04-react-prueba-tecnica/) |
+| `05` | Prueba técnica con formularios, buscador utilizando una API | [Ver](demos/05-react-buscador-peliculas) | [Visitar](https://cursoreact.dev/demos/05-react-buscador-peliculas/) |
+| `06` | Creación de un ecommerce con carrito de compras | [Ver](demos/06-shopping-cart) | [Visitar](https://cursoreact.dev/demos/06-shopping-cart/) |
+| `07` | Creación de un React Router desde cero | [Ver](demos/07-midu-router) | [Visitar](https://cursoreact.dev/demos/07-midu-router/) |
+| `08` | Todo App con TypeScript y animaciones | [Ver](demos/08-todo-app-typescript) | [Visitar](https://cursoreact.dev/demos/08-todo-app-typescript/) |
+| `09` | Crear un Google Translate con ChatGPT y TypeScript | [Ver](demos/09-google-translate-clone/) | [Visitar](https://cursoreact.dev/demos/09-google-translate-clone/) |
+| `10` | Crear un CRUD con Redux Toolkit y TypeScript | [Ver](demos/10-crud-redux/) | [Visitar](https://cursoreact.dev/demos/10-crud-redux/) |
+| `11` | Prueba Técnica con TypeScript y React | [Ver](demos/11-typescript-prueba-tecnica/) | [Visitar](https://cursoreact.dev/demos/11-typescript-prueba-tecnica/) |
+| `11b` | Prueba Técnica con TypeScript y React con React Query | [Ver](demos/11b-typescript-prueba-tecnica-with-react-query/) | [Visitar](https://cursoreact.dev/demos/11b-typescript-prueba-tecnica-with-react-query/) |
+| `12` | Sistema de comentarios con React Query | [Ver](demos/12-comments-react-query) | [Visitar](https://cursoreact.dev/demos/12-comments-react-query/) |
+| `13` | JavaScript Quiz con Zustand y TypeScript | [Ver](demos/13-javascript-quiz-con-zustand/) | [Visitar](https://cursoreact.dev/demos/13-javascript-quiz-con-zustand/) |
+| `14` | Hacker News con TypeScript y SWR | [Ver](demos/14-hacker-news-prueba-tecnica) | [Visitar](https://cursoreact.dev/demos/14-hacker-news-prueba-tecnica/) |
+| `15` | React 19: Actions y actualizaciones optimistas | [Ver](demos/15-react-19/) | [Visitar](https://cursoreact.dev/demos/15-react-19/) |
 
 ## Desarrollo de la web
 
 Requiere Node.js >=22.23.4 y pnpm 12.16.1. Instala con `pnpm install --frozen-lockfile`, ejecuta `pnpm dev` y valida con `pnpm build` (tipos y generación estática).
 
 Las dependencias se actualizan con pnpm y `pnpm-lock.yaml`. TypeScript permanece en 6.0.3: `astro check` todavía no admite TypeScript 7.0.
+
+Las demos se compilan desde `demos/` junto con la web, bajo `/demos/<proyecto>/`. `pnpm build:demos` regenera sus archivos estáticos. En desarrollo, vuelve a ejecutarlo si editas una demo. Cada ejemplo conserva sus versiones de React y bibliotecas para mantener el código de la clase.
+
+La demo del traductor usa MyMemory sin clave privada (límite de 500 bytes por consulta). Las demos de tareas y comentarios persisten los datos en el navegador y la de comentarios simula la latencia para practicar React Query. Los ejemplos de router usan rutas hash para funcionar dentro de su subdirectorio en cualquier alojamiento estático.
+
+## Contenido y transcripciones
+
+Las 14 clases tienen apuntes en `src/clases/`, apoyados en los vídeos del curso. Cada clase permite consultar los capítulos del vídeo y abrir o descargar su transcripción automática completa. Los subtítulos pueden contener errores de reconocimiento: los ejemplos y explicaciones editoriales se presentan por separado.
+
+Las fuentes normalizadas viven en `src/data/transcripts/`. Para actualizarlas, descarga los subtítulos españoles en JSON3 y los metadatos con yt-dlp y ejecuta `python3 scripts/import-transcripts.py <directorio>`. No se necesita descargar el vídeo. `node scripts/verify-site.mjs` comprueba el build, las demos, los enlaces locales, las transcripciones y los botones de copia.

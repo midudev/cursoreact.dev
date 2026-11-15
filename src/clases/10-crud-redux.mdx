@@ -1,0 +1,98 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## Un CRUD con estado global y reglas explícitas
+
+En esta clase creamos una tabla de usuarios con Redux Toolkit, TypeScript y Tremor. El vídeo conecta la store con la interfaz, añade creación y eliminación, persiste el estado y explora actualizaciones optimistas con rollback. La práctica consiste en seguir una operación completa desde el clic hasta el nuevo estado.
+
+Abre el [CRUD integrado](/demos/10-crud-redux/) y crea un usuario. Después elimínalo y observa la notificación. La aplicación conserva datos en este navegador; no representa una base de datos compartida entre visitantes.
+
+## Estado, acciones y reducers
+
+Redux centraliza un estado que varios componentes pueden consultar. Una acción describe qué ha ocurrido; un reducer calcula cómo cambia la store. Redux Toolkit reduce la configuración con `configureStore` y `createSlice`.
+
+```typescript
+import { configureStore, createSlice, type PayloadAction } from '@reduxjs/toolkit'
+
+type User = { id: string; name: string; email: string; github: string }
+const initialState: User[] = []
+
+const usersSlice = createSlice({
+  name: 'users',
+  initialState,
+  reducers: {
+    addUser(state, action: PayloadAction<User>) {
+      state.push(action.payload)
+    },
+    deleteUser(state, action: PayloadAction<User['id']>) {
+      return state.filter(user => user.id !== action.payload)
+    }
+  }
+})
+
+export const store = configureStore({ reducer: { users: usersSlice.reducer } })
+export const { addUser, deleteUser } = usersSlice.actions
+```
+
+Los reducers de `createSlice` trabajan sobre un borrador gestionado por Immer. Por eso `push` resulta válido dentro de ese contexto. No generalices esa sintaxis a cualquier objeto de estado de React: fuera de Immer debes conservar la inmutabilidad por tu cuenta.
+
+## Conecta la store a React
+
+Coloca `Provider` por encima del árbol que consume Redux. Deriva los tipos de la propia store para que no se desincronicen cuando añadas reducers.
+
+```tsx
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
+
+export const useAppDispatch: () => AppDispatch = useDispatch
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+
+function UsersTable() {
+  const users = useAppSelector(state => state.users)
+  const dispatch = useAppDispatch()
+  return <tbody>{users.map(user => (
+    <tr key={user.id}>
+      <td>{user.name}</td><td>{user.email}</td>
+      <td><button onClick={() => dispatch(deleteUser(user.id))}>Eliminar</button></td>
+    </tr>
+  ))}</tbody>
+}
+```
+
+En este fragmento, `TypedUseSelectorHook`, `useSelector` y `useDispatch` se importan desde `react-redux`. El vídeo extrae estos hooks para que los componentes no repitan detalles de tipado.
+
+## Crear y validar usuarios
+
+El formulario recoge nombre, correo y usuario de GitHub. Valida los campos, elimina espacios y genera un ID estable antes de enviar la acción. Una validación fallida es estado local del formulario: no hace falta subir cada mensaje de error a Redux.
+
+<LessonNote title="Elige qué merece ser global" tone="idea">
+La colección de usuarios se comparte entre la tabla y el formulario. El texto que estás escribiendo o la visibilidad de un mensaje puede permanecer en el componente que lo utiliza.
+</LessonNote>
+
+## Persistencia con middleware
+
+Un middleware rodea el procesamiento de una acción. Para persistir, deja primero que la acción llegue al reducer mediante `next(action)` y después consulta el estado actualizado con `store.getState()`. Guardar antes de `next` persistiría el valor anterior.
+
+```typescript
+const persistenceMiddleware: Middleware = store => next => action => {
+  const result = next(action)
+  localStorage.setItem('curso-users', JSON.stringify(store.getState()))
+  return result
+}
+```
+
+Este ejemplo es deliberadamente pequeño. En producción, filtra las acciones relevantes, valida los datos recuperados y contempla errores de almacenamiento. No introduzcas peticiones HTTP ni acceso al DOM dentro del reducer.
+
+<LearningDiagram title="Una eliminación optimista" steps={[
+  { title: 'Actualizar', code: 'dispatch(deleteUser(id))', text: 'Retiras el usuario de la interfaz para dar una respuesta inmediata.' },
+  { title: 'Confirmar', code: 'await deleteUserOnServer(id)', text: 'La operación externa confirma si el cambio puede darse por definitivo.' },
+  { title: 'Recuperar', code: 'dispatch(rollbackUser(previousUser))', text: 'Si falla, recuperas el registro y comunicas el error. Evita insertarlo dos veces.' }
+]} />
+
+## Rollback y práctica
+
+Para deshacer una eliminación necesitas conservar el usuario anterior. Si el servicio falla, una acción de rollback puede restaurarlo. Si además quieres mantener el orden original, guarda su posición. El rollback forma parte de la operación: una notificación de error sin restaurar los datos deja una interfaz incorrecta.
+
+El vídeo muestra herramientas de su momento, como Rome y esa versión de Tremor. Los conceptos de estado y acciones son independientes del aspecto de la tabla.
+
+**Reto:** implementa edición de usuarios. Prueba creación, edición, eliminación y recarga. Simula un fallo de red y confirma que el rollback conserva la identidad, el contenido y el orden del registro.

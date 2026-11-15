@@ -1,3 +1,8 @@
+import StatePlayground from "../components/learning/StatePlayground.astro"
+import ReactConcepts from "../components/learning/ReactConcepts.astro"
+import LearningDiagram from "../components/learning/LearningDiagram.astro"
+import LessonNote from "../components/learning/LessonNote.astro"
+
 # Clase 1: Introducción a React
 
 ¡Bienvenido/a a la primera clase de nuestro curso de React! En esta sesión, sentaremos las bases para entender qué es React, por qué es tan popular y cómo empezar a crear nuestras primeras interfaces de usuario.
@@ -12,13 +17,19 @@ Comenzamos con una breve introducción al curso, los objetivos de esta primera c
 
 React es una **librería de JavaScript** para construir **interfaces de usuario (UI)**. Es desarrollada y mantenida por Meta (anteriormente Facebook) y una comunidad masiva de desarrolladores.
 
-Puntos clave:
+<ReactConcepts />
 
-*   **No es un framework completo:** Se enfoca solo en la capa de la vista (cómo se ve tu UI). Necesitarás otras librerías para enrutamiento, manejo de estado avanzado, etc., aunque React tiene un gran ecosistema para eso.
-*   **Declarativo:** Describe cómo debe verse la UI en cualquier estado, y React se encarga de actualizar eficientemente el DOM cuando los datos cambian. Esto contrasta con el enfoque imperativo, donde manualmente manipulas el DOM paso a paso.
-*   **Basado en componentes:** Construyes UIs con piezas pequeñas y reutilizables llamadas componentes.
+> Tu trabajo es describir la interfaz. React conecta esa descripción con lo que ves en pantalla.
+
+<StatePlayground />
 
 ---
+
+<LessonNote title="Piensa en la interfaz como un resultado" tone="idea">
+Describe cómo debería verse la pantalla con los datos actuales. React se encarga de sincronizarla cuando esos datos cambian.
+</LessonNote>
+
+<LearningDiagram title="De los datos a la pantalla" steps={[{"title": "Datos", "code": "const nombre = \"Ada\"", "text": "Todo empieza con los datos. Un componente recibe props y puede guardar estado para recordar información entre renders."}, {"title": "Componente", "code": "<Saludo nombre={nombre} />", "text": "React ejecuta tu componente para calcular qué interfaz corresponde a esos datos. JSX describe ese resultado."}, {"title": "Interfaz", "code": "Hola, Ada", "text": "React actualiza el DOM con los cambios necesarios. Si los datos cambian, vuelve a calcular la interfaz."}]} />
 
 ## ¿De dónde sale React?
 

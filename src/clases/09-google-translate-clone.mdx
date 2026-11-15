@@ -1,0 +1,89 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## Un traductor para practicar estado y asincronía
+
+El vídeo construye un traductor con React y TypeScript: modela el estado con un reducer, crea selectores de idioma, conecta un servicio de traducción y añade debounce, portapapeles, voz y pruebas. Es un buen proyecto para aprender a separar interfaz, reglas y servicios externos.
+
+La [demo integrada](/demos/09-google-translate-clone/) conserva esa interfaz y usa MyMemory sin clave privada. Debes elegir el idioma de origen y cada consulta tiene un límite de 500 bytes. El vídeo muestra la integración original con OpenAI; el proveedor del servicio está aislado para que puedas sustituirlo.
+
+## Modela los cambios como acciones
+
+El traductor combina idiomas, texto de entrada, resultado y estado de carga. Al intercambiar idiomas cambian varios valores a la vez. Un reducer permite describir esa operación como una sola transición y evita olvidar una parte del estado.
+
+```typescript
+type Language = 'en' | 'es' | 'de'
+type State = {
+  fromLanguage: Language
+  toLanguage: Language
+  fromText: string
+  result: string
+  loading: boolean
+}
+type Action =
+  | { type: 'setText'; payload: string }
+  | { type: 'setResult'; payload: string }
+  | { type: 'swap' }
+```
+
+Una unión discriminada relaciona el tipo de acción con su payload. Si una acción no necesita datos, no le añadas un payload opcional que complique todos los casos.
+
+```typescript
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'setText':
+      return { ...state, fromText: action.payload, loading: true }
+    case 'setResult':
+      return { ...state, result: action.payload, loading: false }
+    case 'swap':
+      return { ...state,
+        fromLanguage: state.toLanguage,
+        toLanguage: state.fromLanguage,
+        fromText: state.result,
+        result: state.fromText }
+  }
+}
+```
+
+En una implementación completa, añade acciones de inicio, error y vaciado. Si permites detección automática, define también qué debe ocurrir al intercambiar idiomas: `auto` no representa un idioma de destino válido.
+
+## Aísla el proveedor de traducción
+
+El componente no debería construir prompts, configurar clientes o interpretar toda la respuesta de una API. Define `translate({ fromLanguage, toLanguage, text })` y devuelve el texto traducido. Así la interfaz sigue funcionando si cambias de proveedor.
+
+<LessonNote title="Una variable VITE_ no guarda un secreto" tone="warning">
+Las variables que Vite expone al cliente forman parte del JavaScript descargado. Una clave privada de OpenAI debe usarse en un backend, no en el navegador. La demo pública no contiene una clave privada.
+</LessonNote>
+
+El servicio debe comprobar el estado HTTP y la estructura de la respuesta. Si origen y destino coinciden, puede devolver el texto sin realizar una llamada. Si el proveedor impone límites, enséñalos antes de enviar la petición.
+
+## Debounce: espera a que el usuario haga una pausa
+
+Enviar una petición por pulsación genera trabajo innecesario. El hook de debounce conserva el valor anterior hasta que transcurre un plazo sin cambios. Cada nueva pulsación cancela el temporizador anterior.
+
+```tsx
+function useDebounce<T>(value: T, delay: number) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(timeout)
+  }, [value, delay])
+  return debounced
+}
+```
+
+Debounce y control de respuestas son problemas distintos. Aunque esperes antes de consultar, una respuesta antigua puede llegar después de una reciente. Como ampliación, cancela la petición anterior con `AbortController` o ignora su resultado mediante la limpieza del efecto.
+
+<LearningDiagram title="Del teclado a una traducción" steps={[
+  { title: 'Escribir', code: 'setFromText(text)', text: 'El texto del input responde de inmediato. El usuario no espera a la red para ver lo que escribe.' },
+  { title: 'Esperar', code: 'useDebounce(fromText, 300)', text: 'La consulta usa el último texto cuando el usuario hace una pausa.' },
+  { title: 'Traducir', code: 'await translate({ text, ...languages })', text: 'El servicio obtiene la traducción. La interfaz representa carga, resultado o error.' }
+]} />
+
+## Copiar, escuchar y probar
+
+`navigator.clipboard.writeText(result)` copia el resultado desde una interacción del usuario. Comunica si ha funcionado. Para escuchar, crea `SpeechSynthesisUtterance`, asigna el idioma y usa `speechSynthesis.speak`. Contempla que las voces disponibles dependen del navegador y del sistema.
+
+En las pruebas, sustituye el servicio por una respuesta controlada. Verifica cambios de idioma, intercambio, resultado, error y debounce sin depender de la disponibilidad de un proveedor real. Los temporizadores simulados permiten probar la espera sin ralentizar la suite.
+
+**Reto:** añade un botón de reintento y evita que una respuesta antigua sobrescriba una traducción nueva. Comprueba el caso de vaciar el input mientras hay una consulta pendiente.

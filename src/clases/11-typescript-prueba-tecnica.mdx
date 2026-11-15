@@ -1,0 +1,96 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## Resuelve la prueba como una secuencia de decisiones
+
+El vídeo parte de un enunciado: recuperar usuarios, mostrarlos en una tabla, colorear filas, ordenar por país, eliminar registros, restaurarlos y filtrar por país. Después amplía la ordenación a las cabeceras. La dificultad está en que estas operaciones deben convivir sin corromper la colección original.
+
+Prueba la [tabla integrada](/demos/11-typescript-prueba-tecnica/). Hay también una [variante con React Query](/demos/11b-typescript-prueba-tecnica-with-react-query/), que se retoma en la siguiente clase.
+
+## Divide el trabajo antes de programar
+
+Empieza con la petición y la tabla más sencilla. Implementa después coloreado, ordenación, eliminación y restauración. Esta secuencia deja una aplicación comprobable en cada paso y permite explicar tu razonamiento durante una entrevista.
+
+Define un tipo que represente los campos que realmente utiliza la interfaz. No necesitas copiar manualmente cientos de propiedades de una respuesta externa, pero sí conocer su forma y validar lo imprescindible al consumirla.
+
+```typescript
+interface User {
+  login: { uuid: string }
+  name: { first: string; last: string }
+  location: { country: string }
+  picture: { thumbnail: string }
+}
+type SortBy = 'none' | 'first' | 'last' | 'country'
+```
+
+El ID estable de Random User es `login.uuid`. Usar el índice del array como identidad hace que eliminar u ordenar registros pueda asociar la interfaz al usuario equivocado.
+
+## Carga, error y cancelación
+
+Representa al menos tres estados: cargando, resultado y error. Comprueba `response.ok` antes de interpretar el JSON y cancela o ignora la petición si el componente deja de necesitarla.
+
+```tsx
+useEffect(() => {
+  const controller = new AbortController()
+  setLoading(true)
+  fetch('https://randomuser.me/api/?results=100&seed=midudev', {
+    signal: controller.signal
+  })
+    .then(response => {
+      if (!response.ok) throw new Error('No se pudieron cargar usuarios')
+      return response.json()
+    })
+    .then(data => {
+      setUsers(data.results)
+      originalUsers.current = data.results
+    })
+    .catch(error => {
+      if (error.name !== 'AbortError') setError(error.message)
+    })
+    .finally(() => {
+      if (!controller.signal.aborted) setLoading(false)
+    })
+  return () => controller.abort()
+}, [])
+```
+
+`originalUsers` es una referencia creada con `useRef<User[]>([])`. Conserva la respuesta inicial para restaurar registros sin usarla como otro estado de render. Si mutas sus objetos, también habrás estropeado la copia que querías preservar.
+
+## Filtra y ordena sin tocar el origen
+
+La tabla visible es una derivación: usuarios actuales, filtro y orden elegido. Evita guardar por separado una lista filtrada y una ordenada que después debas sincronizar.
+
+```tsx
+const filtered = useMemo(() => users.filter(user =>
+  user.location.country.toLowerCase().includes(filterCountry.toLowerCase())
+), [users, filterCountry])
+
+const sorted = useMemo(() => {
+  if (sortBy === 'none') return filtered
+  const value = (user: User) => sortBy === 'country'
+    ? user.location.country : user.name[sortBy === 'first' ? 'first' : 'last']
+  return [...filtered].sort((a, b) => value(a).localeCompare(value(b)))
+}, [filtered, sortBy])
+```
+
+`sort` modifica el array sobre el que se ejecuta. Copiarlo antes evita alterar `users` o una colección que otros componentes estén utilizando. La memoización conserva el cálculo mientras no cambien sus dependencias; no convierte una operación incorrecta en correcta.
+
+<LearningDiagram title="La tabla es una vista de tus datos" steps={[
+  { title: 'Colección', code: 'users', text: 'Es la fuente de verdad. Eliminar cambia esta colección mediante el UUID del usuario.' },
+  { title: 'Filtro', code: 'users.filter(matchesCountry)', text: 'Seleccionas los registros que cumplen el texto escrito, sin eliminar los demás del origen.' },
+  { title: 'Orden', code: '[...filtered].sort(compare)', text: 'La tabla muestra una copia ordenada. Restaurar recupera los datos iniciales.' }
+]} />
+
+<LessonNote title="Una fila representa a una persona, no una posición" tone="idea">
+Eliminar por índice después de ordenar puede quitar otra persona. Usa el UUID tanto para key como para identificar el registro en los handlers.
+</LessonNote>
+
+## Coloreado y cabeceras accesibles
+
+El coloreado alterno depende de la posición visible y puede resolverse con CSS. Es un cambio de presentación, no una transformación de los usuarios. Para ordenar desde una cabecera, utiliza un botón dentro de `th` y comunica el sentido con `aria-sort` cuando corresponda.
+
+## Verifica las combinaciones
+
+Ordena, filtra, elimina una fila y restaura. Después cambia el filtro: el registro restaurado debe seguir en la colección aunque no coincida con la búsqueda actual. Simula una API caída y comprueba que el error no deja un indicador de carga infinito.
+
+**Reto:** añade dirección ascendente y descendente, búsqueda sin distinguir acentos y una acción de restauración que explique claramente si también restablece los filtros y el orden.

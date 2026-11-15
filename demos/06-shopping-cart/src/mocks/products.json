@@ -1,0 +1,457 @@
+{
+  "products": [
+    {
+      "id": 122,
+      "title": "iPhone 6",
+      "description": "The iPhone 6 is a stylish and capable smartphone with a larger display and improved performance. It introduced new features and design elements, making it a popular choice in its time.",
+      "price": 299.99,
+      "discountPercentage": 6.69,
+      "rating": 3.41,
+      "stock": 60,
+      "category": "smartphones",
+      "brand": "Apple",
+      "thumbnail": "products/122.webp",
+      "images": [
+        "products/122.webp"
+      ]
+    },
+    {
+      "id": 124,
+      "title": "iPhone X",
+      "description": "The iPhone X is a flagship smartphone featuring a bezel-less OLED display, facial recognition technology (Face ID), and impressive performance. It represents a milestone in iPhone design and innovation.",
+      "price": 899.99,
+      "discountPercentage": 19.59,
+      "rating": 2.51,
+      "stock": 37,
+      "category": "smartphones",
+      "brand": "Apple",
+      "thumbnail": "products/124.webp",
+      "images": [
+        "products/124.webp"
+      ]
+    },
+    {
+      "id": 133,
+      "title": "Samsung Galaxy S10",
+      "description": "The Samsung Galaxy S10 is a flagship device featuring a dynamic AMOLED display, versatile camera system, and powerful performance. It represents innovation and excellence in smartphone technology.",
+      "price": 699.99,
+      "discountPercentage": 5.59,
+      "rating": 3.06,
+      "stock": 19,
+      "category": "smartphones",
+      "brand": "Samsung",
+      "thumbnail": "products/133.webp",
+      "images": [
+        "products/133.webp"
+      ]
+    },
+    {
+      "id": 126,
+      "title": "Oppo F19 Pro Plus",
+      "description": "The Oppo F19 Pro Plus is a feature-rich smartphone with a focus on camera capabilities. It boasts advanced photography features and a powerful performance for a premium user experience.",
+      "price": 399.99,
+      "discountPercentage": 18.64,
+      "rating": 3.51,
+      "stock": 78,
+      "category": "smartphones",
+      "brand": "Oppo",
+      "thumbnail": "products/126.webp",
+      "images": [
+        "products/126.webp"
+      ]
+    },
+    {
+      "id": 135,
+      "title": "Vivo V9",
+      "description": "The Vivo V9 is a smartphone known for its sleek design and emphasis on capturing high-quality selfies. It features a notch display, dual-camera setup, and a modern design.",
+      "price": 299.99,
+      "discountPercentage": 17.67,
+      "rating": 3.6,
+      "stock": 82,
+      "category": "smartphones",
+      "brand": "Vivo",
+      "thumbnail": "products/135.webp",
+      "images": [
+        "products/135.webp"
+      ]
+    },
+    {
+      "id": 78,
+      "title": "Apple MacBook Pro 14 Inch Space Grey",
+      "description": "The MacBook Pro 14 Inch in Space Grey is a powerful and sleek laptop, featuring Apple's M1 Pro chip for exceptional performance and a stunning Retina display.",
+      "price": 1999.99,
+      "discountPercentage": 4.69,
+      "rating": 3.65,
+      "stock": 24,
+      "category": "laptops",
+      "brand": "Apple",
+      "thumbnail": "products/78.webp",
+      "images": [
+        "products/78.webp"
+      ]
+    },
+    {
+      "id": 79,
+      "title": "Asus Zenbook Pro Dual Screen Laptop",
+      "description": "The Asus Zenbook Pro Dual Screen Laptop is a high-performance device with dual screens, providing productivity and versatility for creative professionals.",
+      "price": 1799.99,
+      "discountPercentage": 11.14,
+      "rating": 3.95,
+      "stock": 45,
+      "category": "laptops",
+      "brand": "Asus",
+      "thumbnail": "products/79.webp",
+      "images": [
+        "products/79.webp"
+      ]
+    },
+    {
+      "id": 80,
+      "title": "Huawei Matebook X Pro",
+      "description": "The Huawei Matebook X Pro is a slim and stylish laptop with a high-resolution touchscreen display, offering a premium experience for users on the go.",
+      "price": 1399.99,
+      "discountPercentage": 9.38,
+      "rating": 4.98,
+      "stock": 75,
+      "category": "laptops",
+      "brand": "Huawei",
+      "thumbnail": "products/80.webp",
+      "images": [
+        "products/80.webp"
+      ]
+    },
+    {
+      "id": 81,
+      "title": "Lenovo Yoga 920",
+      "description": "The Lenovo Yoga 920 is a 2-in-1 convertible laptop with a flexible hinge, allowing you to use it as a laptop or tablet, offering versatility and portability.",
+      "price": 1099.99,
+      "discountPercentage": 6.55,
+      "rating": 2.86,
+      "stock": 40,
+      "category": "laptops",
+      "brand": "Lenovo",
+      "thumbnail": "products/81.webp",
+      "images": [
+        "products/81.webp"
+      ]
+    },
+    {
+      "id": 82,
+      "title": "New DELL XPS 13 9300 Laptop",
+      "description": "The New DELL XPS 13 9300 Laptop is a compact and powerful device, featuring a virtually borderless InfinityEdge display and high-end performance for various tasks.",
+      "price": 1499.99,
+      "discountPercentage": 11.89,
+      "rating": 2.67,
+      "stock": 74,
+      "category": "laptops",
+      "brand": "Dell",
+      "thumbnail": "products/82.webp",
+      "images": [
+        "products/82.webp"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Calvin Klein CK One",
+      "description": "CK One by Calvin Klein is a classic unisex fragrance, known for its fresh and clean scent. It's a versatile fragrance suitable for everyday wear.",
+      "price": 49.99,
+      "discountPercentage": 1.89,
+      "rating": 4.37,
+      "stock": 29,
+      "category": "fragrances",
+      "brand": "Calvin Klein",
+      "thumbnail": "products/6.webp",
+      "images": [
+        "products/6.webp"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Chanel Coco Noir Eau De",
+      "description": "Coco Noir by Chanel is an elegant and mysterious fragrance, featuring notes of grapefruit, rose, and sandalwood. Perfect for evening occasions.",
+      "price": 129.99,
+      "discountPercentage": 16.51,
+      "rating": 4.26,
+      "stock": 58,
+      "category": "fragrances",
+      "brand": "Chanel",
+      "thumbnail": "products/7.webp",
+      "images": [
+        "products/7.webp"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Dior J'adore",
+      "description": "J'adore by Dior is a luxurious and floral fragrance, known for its blend of ylang-ylang, rose, and jasmine. It embodies femininity and sophistication.",
+      "price": 89.99,
+      "discountPercentage": 14.72,
+      "rating": 3.8,
+      "stock": 98,
+      "category": "fragrances",
+      "brand": "Dior",
+      "thumbnail": "products/8.webp",
+      "images": [
+        "products/8.webp"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Dolce Shine Eau de",
+      "description": "Dolce Shine by Dolce & Gabbana is a vibrant and fruity fragrance, featuring notes of mango, jasmine, and blonde woods. It's a joyful and youthful scent.",
+      "price": 69.99,
+      "discountPercentage": 0.62,
+      "rating": 3.96,
+      "stock": 4,
+      "category": "fragrances",
+      "brand": "Dolce & Gabbana",
+      "thumbnail": "products/9.webp",
+      "images": [
+        "products/9.webp"
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Gucci Bloom Eau de",
+      "description": "Gucci Bloom by Gucci is a floral and captivating fragrance, with notes of tuberose, jasmine, and Rangoon creeper. It's a modern and romantic scent.",
+      "price": 79.99,
+      "discountPercentage": 14.39,
+      "rating": 2.74,
+      "stock": 91,
+      "category": "fragrances",
+      "brand": "Gucci",
+      "thumbnail": "products/10.webp",
+      "images": [
+        "products/10.webp"
+      ]
+    },
+    {
+      "id": 118,
+      "title": "Attitude Super Leaves Hand Soap",
+      "description": "Attitude Super Leaves Hand Soap is a natural and nourishing hand soap enriched with the goodness of super leaves. It cleanses and moisturizes your hands, leaving them feeling fresh and soft.",
+      "price": 8.99,
+      "discountPercentage": 18.49,
+      "rating": 3.19,
+      "stock": 94,
+      "category": "skin-care",
+      "brand": "Attitude",
+      "thumbnail": "products/118.webp",
+      "images": [
+        "products/118.webp"
+      ]
+    },
+    {
+      "id": 119,
+      "title": "Olay Ultra Moisture Shea Butter Body Wash",
+      "description": "Olay Ultra Moisture Shea Butter Body Wash is a luxurious body wash that hydrates and nourishes your skin with the moisturizing power of shea butter. Enjoy a rich lather and silky-smooth skin.",
+      "price": 12.99,
+      "discountPercentage": 16.39,
+      "rating": 4.51,
+      "stock": 34,
+      "category": "skin-care",
+      "brand": "Olay",
+      "thumbnail": "products/119.webp",
+      "images": [
+        "products/119.webp"
+      ]
+    },
+    {
+      "id": 120,
+      "title": "Vaseline Men Body and Face Lotion",
+      "description": "Vaseline Men Body and Face Lotion is a specially formulated lotion designed to provide long-lasting moisture to men's skin. It absorbs quickly and helps keep the skin hydrated and healthy.",
+      "price": 9.99,
+      "discountPercentage": 13.39,
+      "rating": 3.16,
+      "stock": 95,
+      "category": "skin-care",
+      "brand": "Vaseline",
+      "thumbnail": "products/120.webp",
+      "images": [
+        "products/120.webp"
+      ]
+    },
+    {
+      "id": 16,
+      "title": "Apple",
+      "description": "Fresh and crisp apples, perfect for snacking or incorporating into various recipes.",
+      "price": 1.99,
+      "discountPercentage": 12.62,
+      "rating": 4.19,
+      "stock": 8,
+      "category": "groceries",
+      "brand": "",
+      "thumbnail": "products/16.webp",
+      "images": [
+        "products/16.webp"
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Cooking Oil",
+      "description": "Versatile cooking oil suitable for frying, sautéing, and various culinary applications.",
+      "price": 4.99,
+      "discountPercentage": 9.33,
+      "rating": 4.8,
+      "stock": 10,
+      "category": "groceries",
+      "brand": "",
+      "thumbnail": "products/20.webp",
+      "images": [
+        "products/20.webp"
+      ]
+    },
+    {
+      "id": 22,
+      "title": "Dog Food",
+      "description": "Specially formulated dog food designed to provide essential nutrients for your canine companion.",
+      "price": 10.99,
+      "discountPercentage": 10.27,
+      "rating": 4.55,
+      "stock": 71,
+      "category": "groceries",
+      "brand": "",
+      "thumbnail": "products/22.webp",
+      "images": [
+        "products/22.webp"
+      ]
+    },
+    {
+      "id": 23,
+      "title": "Eggs",
+      "description": "Fresh eggs, a versatile ingredient for baking, cooking, or breakfast.",
+      "price": 2.99,
+      "discountPercentage": 11.05,
+      "rating": 2.53,
+      "stock": 9,
+      "category": "groceries",
+      "brand": "",
+      "thumbnail": "products/23.webp",
+      "images": [
+        "products/23.webp"
+      ]
+    },
+    {
+      "id": 27,
+      "title": "Honey Jar",
+      "description": "Pure and natural honey in a convenient jar, perfect for sweetening beverages or drizzling over food.",
+      "price": 6.99,
+      "discountPercentage": 14.4,
+      "rating": 3.97,
+      "stock": 34,
+      "category": "groceries",
+      "brand": "",
+      "thumbnail": "products/27.webp",
+      "images": [
+        "products/27.webp"
+      ]
+    },
+    {
+      "id": 29,
+      "title": "Juice",
+      "description": "Refreshing fruit juice, packed with vitamins and great for staying hydrated.",
+      "price": 3.99,
+      "discountPercentage": 12.06,
+      "rating": 3.94,
+      "stock": 50,
+      "category": "groceries",
+      "brand": "",
+      "thumbnail": "products/29.webp",
+      "images": [
+        "products/29.webp"
+      ]
+    },
+    {
+      "id": 38,
+      "title": "Rice",
+      "description": "High-quality rice, a staple for various cuisines and a versatile base for many dishes.",
+      "price": 5.99,
+      "discountPercentage": 9.29,
+      "rating": 3.18,
+      "stock": 59,
+      "category": "groceries",
+      "brand": "",
+      "thumbnail": "products/38.webp",
+      "images": [
+        "products/38.webp"
+      ]
+    },
+    {
+      "id": 43,
+      "title": "Decoration Swing",
+      "description": "The Decoration Swing is a charming addition to your home decor. Crafted with intricate details, it adds a touch of elegance and whimsy to any room.",
+      "price": 59.99,
+      "discountPercentage": 10.41,
+      "rating": 3.16,
+      "stock": 47,
+      "category": "home-decoration",
+      "brand": "",
+      "thumbnail": "products/43.webp",
+      "images": [
+        "products/43.webp"
+      ]
+    },
+    {
+      "id": 44,
+      "title": "Family Tree Photo Frame",
+      "description": "The Family Tree Photo Frame is a sentimental and stylish way to display your cherished family memories. With multiple photo slots, it tells the story of your loved ones.",
+      "price": 29.99,
+      "discountPercentage": 14.87,
+      "rating": 4.53,
+      "stock": 77,
+      "category": "home-decoration",
+      "brand": "",
+      "thumbnail": "products/44.webp",
+      "images": [
+        "products/44.webp"
+      ]
+    },
+    {
+      "id": 45,
+      "title": "House Showpiece Plant",
+      "description": "The House Showpiece Plant is an artificial plant that brings a touch of nature to your home without the need for maintenance. It adds greenery and style to any space.",
+      "price": 39.99,
+      "discountPercentage": 7.46,
+      "rating": 4.67,
+      "stock": 28,
+      "category": "home-decoration",
+      "brand": "",
+      "thumbnail": "products/45.webp",
+      "images": [
+        "products/45.webp"
+      ]
+    },
+    {
+      "id": 46,
+      "title": "Plant Pot",
+      "description": "The Plant Pot is a stylish container for your favorite plants. With a sleek design, it complements your indoor or outdoor garden, adding a modern touch to your plant display.",
+      "price": 14.99,
+      "discountPercentage": 6.84,
+      "rating": 3.01,
+      "stock": 59,
+      "category": "home-decoration",
+      "brand": "",
+      "thumbnail": "products/46.webp",
+      "images": [
+        "products/46.webp"
+      ]
+    },
+    {
+      "id": 47,
+      "title": "Table Lamp",
+      "description": "The Table Lamp is a functional and decorative lighting solution for your living space. With a modern design, it provides both ambient and task lighting, enhancing the atmosphere.",
+      "price": 49.99,
+      "discountPercentage": 7.09,
+      "rating": 3.55,
+      "stock": 9,
+      "category": "home-decoration",
+      "brand": "",
+      "thumbnail": "products/47.webp",
+      "images": [
+        "products/47.webp"
+      ]
+    }
+  ],
+  "total": 30,
+  "skip": 0,
+  "limit": 30
+}

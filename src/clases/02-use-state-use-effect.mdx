@@ -1,6 +1,10 @@
+import StatePlayground from "../components/learning/StatePlayground.astro"
+import LearningDiagram from "../components/learning/LearningDiagram.astro"
+import LessonNote from "../components/learning/LessonNote.astro"
+
 ## Inicialización del proyecto
 
-Pasos para configurar un nuevo proyecto, probablemente utilizando herramientas comoVite, o similar.
+En el vídeo creamos el proyecto con Vite y empezamos por el tablero del tres en raya. Después construiremos un seguidor de puntero para practicar efectos y su limpieza. Puedes probar el [juego](/demos/02-tic-tac-toe/) y el [seguidor de puntero](/demos/03-mouse-follower/) dentro de esta web.
 
 ```bash
 # Usando Vite
@@ -31,6 +35,10 @@ Discute cómo se gestionan los estilos en el proyecto (CSS, módulos CSS, styled
   gap: 5px;
 }
 ```
+
+> El estado es la memoria del componente. Cada cambio cuenta una nueva versión de la interfaz.
+
+<StatePlayground />
 
 ## Dibujando el tablero
 
@@ -63,6 +71,12 @@ function Game() {
   // ...otros estados
 }
 ```
+
+<LessonNote title="El estado es una instantánea" tone="idea">
+Llamar a setState no cambia la variable del render actual. Si el siguiente valor depende del anterior, usa la forma setState(prev => siguiente).
+</LessonNote>
+
+<LearningDiagram title="Qué ocurre al actualizar el estado" steps={[{"title": "Evento", "code": "onClick → setBoard(...)", "text": "Un evento inicia la actualización. Crea un tablero nuevo: no modifiques directamente el array del estado."}, {"title": "Render", "code": "Board({ board })", "text": "React programa otro render. El componente lee el nuevo tablero y calcula las casillas que debe mostrar."}, {"title": "Efecto", "code": "useEffect(() => guardar(board), [board])", "text": "Después de actualizar la pantalla, un efecto puede sincronizar el tablero con localStorage."}]} />
 
 ## Estado con los turnos
 

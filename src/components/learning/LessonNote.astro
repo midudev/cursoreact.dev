@@ -1,0 +1,24 @@
+---
+interface Props { title: string; tone?: 'tip' | 'warning' | 'idea' }
+const { title, tone = 'tip' } = Astro.props
+---
+<aside class:list={['lesson-note not-prose', tone]}>
+  <span class="note-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+      {tone === 'idea' ? <path d="M12 2c1.5 6 4 8.5 10 10-6 1.5-8.5 4-10 10C10.5 16 8 13.5 2 12c6-1.5 8.5-4 10-10Z" fill="currentColor" /> : tone === 'warning' ? <path d="M12 5v9m0 4v1" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" /> : <path d="M6 4v10h13m-5-5 5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />}
+    </svg>
+  </span>
+  <div><strong>{title}</strong><div class="note-body"><slot /></div></div>
+</aside>
+<style>
+  .lesson-note { display: flex; gap: .85rem; padding: 1.15rem 1.25rem; margin: 1.5rem 0; background: #eff8ff; border-left: 3px solid #0284c7; border-radius: 0 12px 12px 0; color: #164e63; }
+  .note-icon { display: grid; place-items: center; width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%; background: #d4efff; color: #075985; line-height: 1; }
+  .note-icon svg { display: block; }
+  strong { display: block; font-size: .95rem; margin-bottom: .35rem; }
+  .note-body { font-size: .9rem; line-height: 1.65; }
+  .note-body :global(p) { margin: 0; }
+  .warning { background: #fff8e8; border-color: #d97706; color: #78350f; }
+  .warning .note-icon { background: #ffedb5; color: #78350f; }
+  .idea { background: #f5f0ff; border-color: #8b5cf6; color: #5b21b6; }
+  .idea .note-icon { background: #e9ddff; color: #5b21b6; }
+</style>

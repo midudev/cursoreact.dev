@@ -1,6 +1,6 @@
 const technologies = {
-  css: ['CSS', 'css', '#b58aff'],
-  html: ['HTML', 'html5', '#ff966b'],
+  css: ['CSS', 'css', '#663399'],
+  html: ['HTML', 'html5', '#E34F26'],
   jsx: ['React · JSX', 'react', '#61dafb'],
   tsx: ['React · TSX', 'react', '#61dafb'],
   javascript: ['JavaScript', 'javascript', '#f7df1e'],
@@ -22,10 +22,15 @@ export default {
       className: ['code-technology-icon'], ariaHidden: 'true',
       style: `--technology-icon:url('/icons/${technology[1]}.svg');--technology-color:${technology[2]}`,
     }, children: [] }] : []
+    const logo = language === 'css' ? [{ type: 'element', tagName: 'span', properties: { className: ['code-logo-badge'] }, children: icon }] : icon
     root.children = root.children.map(node => node.type === 'element' && node.tagName === 'pre' ? {
       type: 'element', tagName: 'div', properties: { className: ['code-block'] }, children: [
         { type: 'element', tagName: 'div', properties: { className: ['code-block-heading'] }, children: [
-          ...icon, { type: 'element', tagName: 'span', properties: {}, children: [{ type: 'text', value: label }] },
+          ...logo, { type: 'element', tagName: 'span', properties: {}, children: [{ type: 'text', value: label }] },
+          { type: 'element', tagName: 'button', properties: { type: 'button', className: ['code-copy'], ariaLabel: `Copiar código de ${label}`, ariaLive: 'polite' }, children: [
+            { type: 'element', tagName: 'span', properties: { className: ['code-copy-icon'], ariaHidden: 'true' }, children: [] },
+            { type: 'element', tagName: 'span', properties: { className: ['code-copy-label'] }, children: [{ type: 'text', value: 'Copiar' }] },
+          ] },
         ] }, node,
       ],
     } : node)

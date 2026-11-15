@@ -1,0 +1,14 @@
+---
+interface Props { items: { title: string; text: string; code: string }[] }
+const { items } = Astro.props
+---
+<dl class="concepts not-prose">{items.map(item => <div class="concept"><dt><code>{item.code}</code><span>{item.title}</span></dt><dd>{item.text}</dd></div>)}</dl>
+<style>
+  .concepts { margin: 2rem 0; border-top: 1px solid var(--lesson-border); }
+  .concept { display: grid; grid-template-columns: minmax(140px, .8fr) 1.5fr; align-items: baseline; gap: 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--lesson-border); }
+  dt { display: flex; flex-direction: column; gap: .4rem; }
+  code { color: #0e7490; font-size: 1rem; font-weight: 700; overflow-wrap: anywhere; }
+  dt span { color: #102c46; font-size: .75rem; font-weight: 600; }
+  dd { font-size: .9rem; line-height: 1.7; color: #526173; margin: 0; }
+  @media (max-width: 580px) { .concept { grid-template-columns: 1fr; gap: .65rem; } dt { flex-direction: row; align-items: baseline; gap: 1rem; } }
+</style>

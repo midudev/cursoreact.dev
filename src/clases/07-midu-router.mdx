@@ -1,0 +1,95 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## Construye un router para entender la navegación
+
+En este vídeo creamos una biblioteca de rutas pequeña: empezamos con renderizado condicional y terminamos con enlaces, parámetros dinámicos, carga diferida y pruebas. Implementarlo ayuda a entender lo que una biblioteca de routing hace entre la URL del navegador y tus componentes.
+
+La [demo integrada](/demos/07-midu-router/) utiliza rutas hash para funcionar dentro de su subdirectorio en un alojamiento estático. El vídeo enseña la variante basada en History API. Comparten el mismo problema: **mantener sincronizada la ubicación y la interfaz**.
+
+## De una condición a una suscripción
+
+Leer `window.location.pathname` una vez permite decidir si mostrar Inicio o Acerca de. Sin embargo, cambiar la URL no obliga a React a renderizar. Necesitamos un estado con la ubicación actual y una suscripción a los eventos de navegación.
+
+```jsx
+const NAVIGATION_EVENT = 'curso:navigate'
+
+function navigate(to) {
+  window.history.pushState({}, '', to)
+  window.dispatchEvent(new Event(NAVIGATION_EVENT))
+}
+
+function usePathname() {
+  const [pathname, setPathname] = useState(window.location.pathname)
+
+  useEffect(() => {
+    const update = () => setPathname(window.location.pathname)
+    window.addEventListener(NAVIGATION_EVENT, update)
+    window.addEventListener('popstate', update)
+    return () => {
+      window.removeEventListener(NAVIGATION_EVENT, update)
+      window.removeEventListener('popstate', update)
+    }
+  }, [])
+
+  return pathname
+}
+```
+
+`pushState` no emite por sí mismo `popstate`. Por eso usamos un evento propio para la navegación programática y escuchamos además `popstate` para los botones Atrás y Adelante. La limpieza del efecto evita acumular suscripciones.
+
+<LearningDiagram title="La URL y React tienen que hablar" steps={[
+  { title: 'Enlace', code: 'navigate("/about")', text: 'Una interacción válida actualiza el historial sin pedir un documento completo al servidor.' },
+  { title: 'Evento', code: 'dispatchEvent(navigationEvent)', text: 'La suscripción avisa a React de que ha cambiado la ubicación.' },
+  { title: 'Ruta', code: 'routes.find(matchPath)', text: 'El router escoge el componente asociado y actualiza la pantalla.' }
+]} />
+
+## Un Link sigue siendo un enlace
+
+No sustituyas todos los enlaces por botones. Un enlace permite copiar la dirección, abrir otra pestaña y navegar con teclado. Intercepta únicamente el clic principal sin modificadores sobre una ruta del mismo origen.
+
+```jsx
+function Link({ to, children, target, ...props }) {
+  function handleClick(event) {
+    const modified = event.metaKey || event.ctrlKey
+      || event.shiftKey || event.altKey
+    const sameOrigin = new URL(to, location.href).origin === location.origin
+    if (event.defaultPrevented || event.button !== 0 || modified
+      || (target && target !== '_self') || !sameOrigin) return
+
+    event.preventDefault()
+    navigate(to)
+  }
+  return <a {...props} href={to} target={target} onClick={handleClick}>{children}</a>
+}
+```
+
+Prueba Ctrl/Cmd + clic y el menú contextual. Si dejan de funcionar, has interceptado más interacciones de las necesarias. El comportamiento nativo es parte del contrato del componente.
+
+## Router, Route y parámetros
+
+Una tabla de rutas relaciona patrones con componentes. Para rutas estáticas basta comparar strings; para `/search/:query` hay que extraer el parámetro y decodificarlo. El vídeo utiliza `path-to-regexp` para resolver ese reconocimiento.
+
+```jsx
+const routes = [
+  { path: '/', Component: Home },
+  { path: '/about', Component: About },
+  { path: '/search/:query', Component: Search }
+]
+```
+
+Define también un componente por defecto para las ubicaciones que no coincidan. `Route` puede actuar como configuración declarativa dentro de `Router`: sus props se convierten en entradas de esa tabla. No depende de que el usuario vea un elemento de `Route` en pantalla.
+
+<LessonNote title="Piensa también en la recarga directa" tone="warning">
+Con History API, el servidor debe devolver la entrada de la aplicación para una URL profunda. Las rutas hash de esta demo evitan ese requisito: la parte posterior a # permanece en el navegador.
+</LessonNote>
+
+## Carga solo la página necesaria
+
+`lazy(() => import('./About.jsx'))` permite separar una página en un módulo que se solicita cuando se necesita. Envuélvela con `Suspense` y un fallback útil. El vídeo amplía después las rutas con idioma y prepara el paquete para publicarlo: distingue el código de la aplicación del código que exporta la biblioteca.
+
+## Pruebas y reto
+
+Comprueba la navegación inicial, la ruta desconocida, Atrás/Adelante, los parámetros y los clics modificados. Una prueba debe verificar lo que ve el usuario tras navegar, no limitarse a comprobar que una función fue llamada.
+
+**Reto:** añade una ruta `/products/:id`, muestra el parámetro y contempla un identificador inexistente. Como ampliación, mueve el foco al título de la página tras la navegación y actualiza el título del documento.

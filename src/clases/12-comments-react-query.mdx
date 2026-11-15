@@ -1,0 +1,103 @@
+import LessonNote from '../components/learning/LessonNote.astro'
+import LearningDiagram from '../components/learning/LearningDiagram.astro'
+
+## El estado que viene de fuera necesita otras herramientas
+
+El vídeo tiene dos proyectos. Primero amplía la tabla de usuarios con paginación y scroll infinito; después crea comentarios con mutaciones y actualizaciones optimistas. React Query se encarga de coordinar consultas, caché, carga y errores para que no tengas que reconstruir esa infraestructura en cada componente.
+
+Puedes probar la [tabla paginada](/demos/11b-typescript-prueba-tecnica-with-react-query/) y los [comentarios](/demos/12-comments-react-query/). La demo de comentarios usa almacenamiento local con latencia simulada: permite practicar las transiciones sin depender de una clave de escritura compartida.
+
+<LessonNote title="Los ejemplos del curso usan TanStack Query v4" tone="idea">
+Las demos conservan la versión de la clase. Si usas otra versión mayor, revisa sus opciones y nombres antes de copiar el código. La idea de identificar consultas, guardar resultados e invalidarlos se mantiene.
+</LessonNote>
+
+## Prepara un QueryClient estable
+
+Crea un `QueryClient` y distribúyelo mediante `QueryClientProvider`. No lo recrees en cada render: perderías la caché que pretendes compartir.
+
+```tsx
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
+
+function Root() {
+  return <QueryClientProvider client={queryClient}><App /></QueryClientProvider>
+}
+
+function useComments() {
+  return useQuery({ queryKey: ['comments'], queryFn: getComments })
+}
+```
+
+La `queryKey` identifica el resultado. Si la consulta cambia según un filtro, ese filtro debe formar parte de la clave. Dos componentes que leen la misma consulta pueden compartir datos sin pasarse el resultado por props.
+
+## Paginación e infinite queries
+
+Una consulta infinita mantiene una colección de páginas. `pageParam` indica cuál pedir y `getNextPageParam` decide si existe otra. Conviene devolver desde el servicio tanto los usuarios como el siguiente cursor.
+
+```tsx
+const query = useInfiniteQuery({
+  queryKey: ['users'],
+  queryFn: ({ pageParam = 1 }) => fetchUsers({ pageParam }),
+  getNextPageParam: lastPage => lastPage.nextCursor
+})
+
+const users = query.data?.pages.flatMap(page => page.users) ?? []
+```
+
+Empieza con un botón «Cargar más». Desactívalo si ya hay una carga en curso o no quedan páginas. Después puedes añadir `IntersectionObserver` para solicitar la siguiente cuando un marcador entra en pantalla. Limpia el observer al desmontar y evita disparar peticiones duplicadas.
+
+## Cuándo refrescar los datos
+
+La caché no significa que el resultado sea válido para siempre. Decide cuánto tiempo puede considerarse reciente, cuándo actualizarlo y qué debe ocurrir al volver a la pestaña. El vídeo explora refetching y DevTools para observar esas decisiones.
+
+No confundas `isLoading` con cualquier actividad de red. Puedes tener datos visibles y estar refrescándolos en segundo plano. Enseñar un pequeño indicador evita desmontar toda la lista cada vez que se consulta otra vez.
+
+## Una mutación cambia datos
+
+Una query lee; una mutación expresa una operación como crear un comentario. Cuando termina puedes invalidar la consulta para volver a pedirla o actualizar la caché con el resultado confirmado por el servicio.
+
+```tsx
+const mutation = useMutation({
+  mutationFn: postComment,
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['comments'] })
+})
+```
+
+Desactiva el envío mientras está pendiente, conserva el texto si hay un error y ofrece reintento. No muestres éxito antes de saber qué significa ese éxito en tu aplicación.
+
+<LearningDiagram title="La actualización optimista tiene una vuelta atrás" steps={[
+  { title: 'Preparar', code: 'cancelQueries + getQueryData', text: 'Detienes refetches que podrían pisar el cambio y guardas una instantánea del resultado anterior.' },
+  { title: 'Anticipar', code: 'setQueryData(newComments)', text: 'La interfaz enseña temporalmente el comentario mientras se completa la operación.' },
+  { title: 'Resolver', code: 'rollback o invalidateQueries', text: 'Si falla, restauras la instantánea. Al terminar, sincronizas de nuevo con la fuente de datos.' }
+]} />
+
+## Implementa el rollback
+
+La clase termina explicando por qué no basta con insertar un comentario en pantalla. Si el servicio lo rechaza, hay que eliminar ese resultado provisional y recuperar un estado coherente.
+
+```tsx
+useMutation({
+  mutationFn: postComment,
+  onMutate: async comment => {
+    await queryClient.cancelQueries({ queryKey: ['comments'] })
+    const previous = queryClient.getQueryData(['comments'])
+    queryClient.setQueryData(['comments'], (old = []) => [
+      ...old, { ...comment, id: crypto.randomUUID(), preview: true }
+    ])
+    return { previous }
+  },
+  onError: (_error, _comment, context) => {
+    queryClient.setQueryData(['comments'], context?.previous)
+  },
+  onSettled: () => queryClient.invalidateQueries({ queryKey: ['comments'] })
+})
+```
+
+El fragmento ilustra el flujo; en TypeScript tipa también la colección, las variables de la mutación y su contexto. Si permites varias mutaciones simultáneas, una instantánea global puede sobrescribir otros cambios: considera IDs provisionales y rollback por operación.
+
+## Reto
+
+Añade borrado optimista de comentarios y un fallo de red simulado. Prueba éxito, error, reintento y recarga. En la tabla, llega al límite de páginas y confirma que el observador deja de consultar. Explica qué parte del estado pertenece al servidor y cuál sigue siendo estado local de interfaz.
+
+Consulta la [documentación de actualizaciones optimistas de v4](https://tanstack.com/query/v4/docs/framework/react/guides/optimistic-updates) para contrastar las opciones de la versión utilizada.

@@ -1,0 +1,51 @@
+---
+import DemoLabel from "./DemoLabel.astro"
+---
+<state-playground class="not-prose">
+  <div class="lab-intro"><DemoLabel /><h3>Un clic. Un dato nuevo.<br />Una interfaz que cambia.</h3><p>Actualiza el estado y sigue su recorrido hasta la pantalla.</p></div>
+  <div class="lab-flow">
+    <div class="lab-node"><span>Estado</span><code>likes = <b data-value>0</b></code></div>
+    <span class="lab-connector" aria-hidden="true">→</span>
+    <div class="lab-node lab-component"><span>Componente</span><code>&lt;LikeButton /&gt;</code></div>
+    <span class="lab-connector" aria-hidden="true">→</span>
+    <div class="lab-preview"><span>Tu pantalla</span><button type="button" data-like aria-label="Añadir un me gusta">♡ <b data-count>0</b> Me gusta</button></div>
+  </div>
+  <div class="lab-bottom"><p aria-live="polite" data-status>Todo empieza con el estado inicial: 0.</p><button type="button" data-reset>Reiniciar</button></div>
+</state-playground>
+<script>
+  class StatePlayground extends HTMLElement {
+    connectedCallback() {
+      let count = 0
+      const update = () => {
+        this.querySelector('[data-value]')!.textContent = String(count)
+        this.querySelector('[data-count]')!.textContent = String(count)
+        this.querySelector('[data-status]')!.textContent = count ? `Estado actualizado a ${count}. React refleja el nuevo valor en la interfaz.` : 'Todo empieza con el estado inicial: 0.'
+        this.getAnimations({ subtree: true }).forEach(animation => animation.cancel())
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          this.querySelectorAll('.lab-node, .lab-preview').forEach((node, i) => node.animate([{ transform: 'translateY(0)', outlineColor: 'transparent' }, { transform: 'translateY(-4px)', outlineColor: '#38bdf8' }, { transform: 'translateY(0)', outlineColor: 'transparent' }], { duration: 500, delay: i * 160 }))
+        }
+      }
+      this.querySelector('[data-like]')?.addEventListener('click', () => { count++; update() })
+      this.querySelector('[data-reset]')?.addEventListener('click', () => { count = 0; update() })
+    }
+  }
+  if (!customElements.get('state-playground')) customElements.define('state-playground', StatePlayground)
+</script>
+<style>
+  state-playground { display: block; padding: clamp(1.25rem, 4vw, 2rem); margin: 2.5rem 0; background: #102c46; --lesson-interactive: #a5f3fc; border-radius: 20px; color: #fff; overflow: hidden; }
+
+  h3 { margin: 1rem 0 .75rem; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 750; letter-spacing: -.035em; line-height: 1.2; }
+  .lab-intro p { font-size: .9rem; color: #b9d6e9; line-height: 1.6; }
+  .lab-flow { display: flex; align-items: center; gap: .65rem; margin: 1.75rem 0; }
+  .lab-node, .lab-preview { flex: 1; min-width: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding: 1rem .75rem; border: 1px solid var(--lesson-border-dark); border-radius: 10px; outline: 2px solid transparent; background: #163950; }
+  .lab-flow span:not(.lab-connector) { color: #b9d6e9; font-size: .7rem; margin-bottom: .7rem; }
+  code { color: #67e8f9; font-size: .8rem; overflow-wrap: anywhere; }
+  .lab-component code { color: #d8b4fe; }
+  .lab-connector { color: #67e8f9; }
+  [data-like] { background: #a5f3fc; color: #083344; border-radius: 6px; padding: .6rem; font-size: .75rem; font-weight: 700; cursor: pointer; }
+  [data-like]:hover { background: #cffafe; }
+  .lab-bottom { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--lesson-border-dark); padding-top: 1rem; }
+  .lab-bottom p { color: #b9d6e9; font-size: .75rem; line-height: 1.6; }
+  [data-reset] { color: #a5f3fc; font-size: .75rem; text-decoration: underline; cursor: pointer; }
+  @media (max-width: 580px) { .lab-flow { flex-direction: column; } .lab-node, .lab-preview { width: 100%; padding: 1rem; } .lab-connector { transform: rotate(90deg); } }
+</style>

@@ -1,6 +1,8 @@
 ---
 import { CLASES } from "../consts"
 import Layout from "../layouts/Layout.astro"
+import VideoGuide from "../components/learning/VideoGuide.astro"
+import CodeTools from "../components/CodeTools.astro"
 import Footer from "../components/Footer.astro"
 export function getStaticPaths() { return CLASES.map((info, index) => ({ params: { clase: info.slug }, props: { info, index } })) }
 interface Props { info: (typeof CLASES)[number]; index: number }
@@ -32,6 +34,7 @@ const Content = module ? (await module() as { default: any }).default : null
           {info.web && <a class="resource" href={info.web} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18m-14-3h1m2 0h1"/></svg><span>Probar demo<small>Abre la aplicación en vivo</small></span><span aria-hidden="true">↗</span></a>}
           <a class="resource resource-youtube" href={`https://www.youtube.com/watch?v=${info.id}`} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.6 4.6 12 4.6 12 4.6s-5.6 0-7.5.5a3 3 0 0 0-2.1 2.1C2 9.1 2 12 2 12s0 2.9.4 4.8a3 3 0 0 0 2.1 2.1c1.9.5 7.5.5 7.5.5s5.6 0 7.5-.5a3 3 0 0 0 2.1-2.1c.4-1.9.4-4.8.4-4.8s0-2.9-.4-4.8ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg><span>Ver en YouTube<small>Comentarios y más vídeos</small></span><span aria-hidden="true">↗</span></a>
         </nav>
+        <VideoGuide slug={info.slug} />
         <div class="lesson-notes prose prose-slate max-w-none prose-a:text-sky-800">{Content ? <Content components={{ h1: "h2" }} /> : <p>{info.description}</p>}</div>
         <nav aria-label="Siguiente y anterior clase" class="my-10 flex justify-between gap-5 text-sm font-semibold text-sky-800">
           {index > 0 && <a href={`/${CLASES[index - 1].slug}`}>← Clase anterior</a>}
@@ -47,6 +50,7 @@ const Content = module ? (await module() as { default: any }).default : null
         <a class="outline-all" href="/">Explorar todas las clases <span aria-hidden="true">↗</span></a>
       </aside>
     </div>
+    <CodeTools />
     <Footer />
   </div>
 </Layout>
@@ -56,11 +60,11 @@ const Content = module ? (await module() as { default: any }).default : null
   .lesson-meta span { color: #94a3b8; margin: 0 .5rem; }
   h1 { font-size: clamp(1.8rem, 3vw, 2.75rem); line-height: 1.12; letter-spacing: -.04em; font-weight: 750; color: #0f172a; max-width: 25ch; text-wrap: balance; }
   .lesson-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
-  .lesson-tags li { background: #f0f9ff; color: #075985; border: 1px solid #e0f2fe; padding: .2rem .6rem; border-radius: 6px; font-size: .75rem; font-weight: 550; }
+  .lesson-tags li { background: #f0f9ff; color: #075985; border: 1px solid var(--lesson-border); padding: .2rem .6rem; border-radius: 6px; font-size: .75rem; font-weight: 550; }
   .player { overflow: hidden; border-radius: 16px; background: #10141c; box-shadow: 0 10px 32px -16px #0f172a55; }
   .player iframe { display: block; width: 100%; height: auto; aspect-ratio: 16/9; border: 0; }
   .lesson-resources { display: flex; flex-wrap: wrap; gap: .65rem; margin: 1.25rem 0 3rem; }
-  .resource { flex: 1 1 200px; display: flex; align-items: center; gap: .75rem; border: 1px solid #cbd5e1; border-radius: 10px; padding: .9rem 1rem; color: #0f172a; background: white; font-size: .85rem; font-weight: 650; transition: background .15s, border-color .15s; }
+  .resource { flex: 1 1 200px; display: flex; align-items: center; gap: .75rem; border: 1px solid var(--lesson-border); border-radius: 10px; padding: .9rem 1rem; color: #0f172a; background: white; font-size: .85rem; font-weight: 650; transition: background .15s, border-color .15s; }
   .resource:hover { background: #f0f9ff; border-color: #0284c7; }
   .resource svg { width: 24px; height: 24px; flex-shrink: 0; }
   .resource > span:last-child { margin-left: auto; }
@@ -69,20 +73,29 @@ const Content = module ? (await module() as { default: any }).default : null
   .resource-code small { color: #cbd5e1; }
   .resource-code:hover { background: #1e293b; border-color: #1e293b; }
   .resource-youtube svg { color: #dc2626; }
-  .lesson-notes { font-size: 1rem; line-height: 1.7; color: #334155; }
-  .lesson-notes :global(p), .lesson-notes :global(ul), .lesson-notes :global(ol), .lesson-notes :global(blockquote) { max-width: 72ch; }
-  .lesson-notes :global(p) { margin: .8rem 0; }
-  .lesson-notes :global(h2) { margin: 1.75rem 0 .65rem; font-size: clamp(1.35rem, 2vw, 1.65rem); line-height: 1.3; letter-spacing: -.025em; font-weight: 700; text-wrap: balance; }
-  .lesson-notes :global(h3) { margin: 1.4rem 0 .5rem; font-size: 1.15rem; line-height: 1.4; }
-  .lesson-notes :global(ul), .lesson-notes :global(ol) { margin: .75rem 0 1rem; padding-left: 1.4rem; }
-  .lesson-notes :global(li) { margin: .4rem 0; padding-left: .15rem; }
+  .lesson-notes { font-size: 1rem; line-height: 1.75; color: #334155; }
+  .lesson-notes :global(> p), .lesson-notes :global(> ul), .lesson-notes :global(> ol) { max-width: 68ch; }
+  .lesson-notes :global(> p) { margin: 1rem 0; }
+  .lesson-notes :global(> h2) { display: flex; align-items: baseline; gap: .75rem; margin: 2.25rem 0 .8rem; font-size: clamp(1.5rem, 2.5vw, 2rem); line-height: 1.2; letter-spacing: -.035em; font-weight: 750; color: #102c46; text-wrap: balance; }
+  .lesson-notes :global(> h2::before) { content: ''; flex: 0 0 8px; height: 1em; border-radius: 3px; background: #06b6d4; transform: translateY(.1em); }
+  .lesson-notes :global(> h2:nth-of-type(3n)::before) { background: #8b5cf6; }
+  .lesson-notes :global(> h2:nth-of-type(3n + 1)::before) { background: #f59e0b; }
+  .lesson-notes :global(> h2:first-child) { font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -.045em; }
+  .lesson-notes :global(> h2:first-child + p) { font-size: 1.15rem; color: #52647b; line-height: 1.8; }
+  .lesson-notes :global(> h3) { margin: 1.75rem 0 .65rem; font-size: 1.2rem; line-height: 1.4; }
+  .lesson-notes :global(ul), .lesson-notes :global(ol) { margin: 1rem 0 1.5rem; padding-left: 1.4rem; }
+  .lesson-notes :global(li) { margin: .7rem 0; padding-left: .35rem; }
   .lesson-notes :global(li p) { margin: .4rem 0; }
-  .lesson-notes :global(li::marker) { color: #64748b; }
-  .lesson-notes :global(hr) { margin: 1.5rem 0; border-color: #e2e8f0; }
+  .lesson-notes :global(li::marker) { color: #0891b2; font-weight: 700; }
+  .lesson-notes :global(hr) { margin: 1.75rem 0; border: 0; height: 1px; background: var(--lesson-border); }
   .lesson-notes :global(hr + h2) { margin-top: 0; }
   .lesson-notes :global(> :first-child) { margin-top: 0; }
-  .lesson-notes :global(.code-block) { margin: 1.25rem 0; }
-  .lesson-notes :global(pre) { font-size: .85rem; line-height: 1.65; }
+  .lesson-notes :global(.code-block) { margin: 1.5rem 0; }
+  .lesson-notes :global(pre) { font-size: .85rem; line-height: 1.7; }
+  .lesson-notes :global(> p code), .lesson-notes :global(> ul code), .lesson-notes :global(> ol code) { color: #6d28d9; background: #f2edff; padding: .15em .35em; border-radius: 4px; font-size: .85em; }
+  .lesson-notes :global(blockquote) { position: relative; margin: 2.5rem 0; border: 0; border-left: 4px solid #58c4dc; padding: 1.25rem 1.75rem; background: #effafd; border-radius: 0 14px 14px 0; color: #164e63; font-size: clamp(1.2rem, 2vw, 1.5rem); font-weight: 650; line-height: 1.55; letter-spacing: -.02em; font-style: normal; text-wrap: balance; }
+  .lesson-notes :global(blockquote p) { margin: 0; }
+  .lesson-notes :global(blockquote p::before), .lesson-notes :global(blockquote p::after) { content: none; }
   .outline-heading { display: flex; align-items: center; gap: .7rem; padding: .25rem .25rem 1rem; }
   .outline-heading > img { filter: invert(65%) sepia(80%) saturate(600%) hue-rotate(150deg); }
   .outline-heading h2 { font-size: 1rem; font-weight: 750; letter-spacing: -.02em; color: #0f172a; }
@@ -97,10 +110,10 @@ const Content = module ? (await module() as { default: any }).default : null
   .outline-text { min-width: 0; }
   .outline-number { display: block; margin-bottom: .15rem; font-size: .65rem; font-weight: 650; color: #64748b; font-variant-numeric: tabular-nums; }
   .is-current .outline-number { color: #0369a1; }
-  .outline-title { display: block; font-size: .82rem; line-height: 1.45; font-weight: 550; color: #334155; text-wrap: pretty; }
+  .outline-title { display: block; font-size: .82rem; line-height: 1.45; font-weight: 550; color: #334155; text-wrap: balance; }
   .is-current .outline-title { color: #075985; font-weight: 700; }
-  .outline-all { display: flex; justify-content: space-between; margin: 1rem .5rem 0; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #0369a1; font-size: .75rem; font-weight: 650; }
-  .course-outline { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem .75rem; }
+  .outline-all { display: flex; justify-content: space-between; margin: 1rem .5rem 0; padding-top: 1rem; border-top: 1px solid var(--lesson-border); color: #0369a1; font-size: .75rem; font-weight: 650; }
+  .course-outline { background: #f8fafc; border: 1px solid var(--lesson-border); border-radius: 16px; padding: 1rem .75rem; }
   @media (min-width: 1024px) { .course-outline { position: sticky; top: 1.5rem; max-height: calc(100dvh - 3rem); overflow-y: auto; scrollbar-width: thin; scrollbar-color: transparent transparent; } }
   .course-outline:hover, .course-outline:focus-within { scrollbar-color: #94a3b8 transparent; }
   @media (hover: none) { .course-outline { scrollbar-width: none; } }
