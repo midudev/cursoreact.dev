@@ -24,7 +24,7 @@ export default function AboutPage ({ routeParams }) {
     <>
       <h1>{i18n.title}</h1>
       <div>
-        <img src='https://pbs.twimg.com/profile_images/1613612257015128065/oA0Is67J_400x400.jpg' alt='Foto de midudev' />
+        <img src={`${import.meta.env.BASE_URL}images/midudev.png`} width="128" height="128" alt='Foto de midudev' />
         <p>{i18n.description}</p>
       </div>
       <Link to='/'>{i18n.button}</Link>

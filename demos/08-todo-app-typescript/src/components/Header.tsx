@@ -1,4 +1,5 @@
 import { CreateTodo } from './CreateTodo'
+import reactLogo from '../assets/react.svg'
 
 interface Props {
   saveTodo: (title: string) => void
@@ -10,7 +11,9 @@ export const Header: React.FC<Props> = ({ saveTodo }) => {
       <h1>todo
         <img
           style={{ width: '60px', height: 'auto' }}
-          src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/1200px-Typescript_logo_2020.svg.png'></img>
+          src={reactLogo}
+          alt="React"
+        />
       </h1>
 
       <CreateTodo saveTodo={saveTodo} />
