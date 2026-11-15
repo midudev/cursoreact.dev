@@ -27,3 +27,7 @@ pnpm-debug.log*
 /public/demos/
 
 .playwright-mcp/
+
+# Cloudflare Wrangler
+.wrangler/
+.dev.vars*

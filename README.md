@@ -58,6 +58,16 @@ Las demos se compilan desde `demos/` junto con la web, bajo `/demos/<proyecto>/`
 
 La demo del traductor usa MyMemory sin clave privada (límite de 500 bytes por consulta). Las demos de tareas y comentarios persisten los datos en el navegador y la de comentarios simula la latencia para practicar React Query. Los ejemplos de router usan rutas hash para funcionar dentro de su subdirectorio en cualquier alojamiento estático.
 
+## Despliegue en Cloudflare
+
+La web se sirve como sitio estático en [Cloudflare Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/) (Worker `cursoreact-dev`, sin script: las peticiones a assets son gratuitas e ilimitadas). La configuración vive en `wrangler.jsonc`, las cabeceras de seguridad y caché en `public/_headers` y las redirecciones en `public/_redirects`.
+
+- **Producción**: cada push a `main` lanza Workers Builds (`pnpm run build` + `npx wrangler deploy`). Las demás ramas solo compilan y validan (`npx wrangler deploy --dry-run`).
+- **Manual**: `pnpm run deploy`. Para probar el build con el mismo motor de Cloudflare: `pnpm build && pnpm preview:cf`.
+- **Rutas**: las páginas se generan como `clase.html` y se sirven sin barra final (`/01-react-desde-cero`); las demos son carpetas y se sirven con barra (`/demos/<proyecto>/`). Las rutas inexistentes devuelven `404.html`.
+- **Dominio**: `cursoreact.dev/*` es una ruta del Worker sobre un registro DNS proxied. `www.cursoreact.dev` redirige (301) al dominio principal con una Redirect Rule.
+- **Zona**: WAF con bloqueo de sondeos de vulnerabilidades y de métodos distintos de `GET`/`HEAD`/`OPTIONS`, rate limiting por IP solo en páginas (no en assets), TLS 1.2+, HSTS, HTTP/3, 0-RTT y Speed Brain. Email Obfuscation está desactivado para no alterar los ejemplos de código.
+
 ## Contenido y transcripciones
 
 Las 14 clases tienen apuntes en `src/clases/`, apoyados en los vídeos del curso. Cada clase permite consultar los capítulos del vídeo y abrir o descargar su transcripción automática completa. Los subtítulos pueden contener errores de reconocimiento: los ejemplos y explicaciones editoriales se presentan por separado.

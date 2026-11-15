@@ -7,6 +7,8 @@
     "start": "pnpm dev",
     "build": "pnpm build:demos && astro check && astro build",
     "preview": "astro preview",
+    "preview:cf": "wrangler dev",
+    "deploy": "pnpm build && wrangler deploy",
     "astro": "astro",
     "build:demos": "node scripts/build-demos.mjs",
     "verify": "node scripts/verify-site.mjs"
@@ -22,7 +24,8 @@
     "typescript": "6.0.3"
   },
   "devDependencies": {
-    "eslint": "10.15.0"
+    "eslint": "10.15.0",
+    "wrangler": "4.162.0"
   },
   "engines": {
     "node": ">=22.23.4"

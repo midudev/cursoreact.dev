@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "cursoreact-dev",
+  "compatibility_date": "2026-11-13",
+  // Sitio 100 % estático: sin script de Worker, las peticiones a assets son gratuitas e ilimitadas
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  // Ruta sobre el registro DNS proxied de la zona (A 192.0.2.0, originless).
+  // www.cursoreact.dev redirige al dominio principal con una Redirect Rule de la zona.
+  "routes": [
+    { "pattern": "cursoreact.dev/*", "zone_name": "cursoreact.dev" }
+  ],
+  // Evita contenido duplicado en *.workers.dev y URL de previsualización públicas
+  "workers_dev": false,
+  "preview_urls": false
+}

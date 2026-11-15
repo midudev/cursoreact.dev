@@ -3,4 +3,5 @@ packages:
 allowBuilds:
   '@swc/core': true
   esbuild: true
+  workerd: true
   rome: false

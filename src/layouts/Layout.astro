@@ -9,7 +9,8 @@ interface Props {
 }
 
 const { title, noindex = false, description = "Aprende React desde cero con 14 clases gratis de midudev: hooks, TypeScript, React 19, proyectos prácticos, vídeos y código fuente.", jsonLd } = Astro.props
-const canonical = new URL(Astro.url.pathname.replace(/\/+$/, "") || "/", Astro.site)
+// Con build.format "file" el pathname incluye ".html": la URL pública no lo lleva
+const canonical = new URL(Astro.url.pathname.replace(/(?:\/index)?\.html$/, "").replace(/\/+$/, "") || "/", Astro.site)
 ---
 
 <!doctype html>

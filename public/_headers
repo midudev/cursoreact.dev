@@ -1,0 +1,46 @@
+# Cabeceras de Cloudflare Workers Static Assets
+# https://developers.cloudflare.com/workers/static-assets/headers/
+# No repetir Cache-Control en reglas que se solapen: Cloudflare concatena los valores.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self'; upgrade-insecure-requests
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+
+# Archivos con hash de contenido: caché permanente
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/demos/:demo/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Recursos estáticos sin hash: caché de un día y revalidación en segundo plano
+/icons/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/favicon.svg
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/og.jpg
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/me.webp
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/me.png
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# Las transcripciones están en español: sin charset explícito los acentos se corrompen
+/transcripciones/*.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  X-Robots-Tag: noindex
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+
+/demos/*
+  X-Robots-Tag: noindex, follow

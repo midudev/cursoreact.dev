@@ -11,6 +11,8 @@ import codeBlocks from "./src/themes/code-blocks.mjs";
 export default defineConfig({
   markdown: { shikiConfig: { theme: codeTheme, transformers: [codeBlocks] } },
   build: {
+    // Páginas como archivos (`/clase.html`): Cloudflare las sirve sin barra final, igual que las URL canónicas
+    format: 'file',
     inlineStylesheets: 'always'
   },
   integrations: [mdx(), sitemap({ filter: (page) => !page.includes("/transcripciones/") })],

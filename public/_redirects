@@ -1,0 +1,3 @@
+# Redirecciones de Cloudflare Workers Static Assets
+# https://developers.cloudflare.com/workers/static-assets/redirects/
+/favicon.ico /favicon.svg 301
