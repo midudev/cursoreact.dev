@@ -68,8 +68,8 @@ const canonical = new URL(Astro.url.pathname.replace(/\/+$/, "") || "/", Astro.s
       .code-copy { margin-left: auto; display: inline-flex; align-items: center; gap: .5rem; border: 1px solid #42516b; border-radius: 6px; padding: .3rem .6rem; color: #e1e9f7; background: #202d43; font: 500 .72rem/1.4 system-ui; cursor: pointer; }
       .code-copy:hover { background: #304363; border-color: #7dd3fc; }
       .code-copy[data-copied] { color: #91ff65; border-color: #658c60; }
-      .code-copy-icon { width: 12px; height: 13px; border: 1px solid currentColor; border-radius: 2px; position: relative; }
-      .code-copy-icon::before { content: ''; position: absolute; width: 8px; height: 9px; border: 1px solid currentColor; border-radius: 1px; top: -4px; left: -4px; background: #202d43; }
+      .code-copy-icon { display: block; width: 16px; height: 16px; flex-shrink: 0; background: currentColor; mask: url('/icons/copy.svg') center / contain no-repeat; }
+      .code-copy[data-copied] .code-copy-icon { mask-image: url('/icons/check.svg'); }
       .prose .code-block pre { color-scheme: dark; scrollbar-width: thin; scrollbar-color: #33435e #090e18; margin: 0; border-radius: 0; padding: 1.25rem; }
       .prose .code-block pre:hover, .prose .code-block pre:focus { scrollbar-color: #7086aa #090e18; }
       .code-block pre::-webkit-scrollbar { height: 7px; }
