@@ -1,4 +1,7 @@
 ---
+import { Image } from "astro:assets"
+import type { ImageMetadata } from "astro"
+const images = import.meta.glob<{ default: ImageMetadata }>("../../public/*.webp", { eager: true })
 import { CLASES } from "../consts"
 ---
 
@@ -42,25 +45,28 @@ import { CLASES } from "../consts"
 </svg>
 
 <div
-  class="grid gap-8 mb-6 lg:mb-16 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto"
+  class="grid gap-6 mb-6 lg:mb-16 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto"
 >
   {
     CLASES.map((clase, index: number) => {
       return (
-        <article class="relative items-center text-black rounded-lg">
+        <article class="group flex h-full flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm transition hover:border-sky-300 hover:shadow-lg">
           <a
             href={`/${clase.slug}`}
-            class="group hover:scale-110 block transition"
+            class="relative block aspect-video overflow-hidden bg-gray-100"
             title={`Ir a la clase ${clase.title}`}
           >
-            <img
-              class="w-full rounded-lg overflow-hidden object-cover aspect-video"
-              src={`./${index + 1}.webp`}
+            <Image
+              class="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+              src={images[`../../public/${index + 1}.webp`].default}
+              widths={[400, 800]} sizes="(min-width: 1024px) 368px, (min-width: 640px) 50vw, 100vw"
+              width="1280" height="720" loading={index < 3 ? "eager" : "lazy"} decoding="async"
               alt={`Captura de pantalla del proyecto de la clase: ${clase.title}`}
             />
+            <span class="absolute left-3 top-3 rounded-md bg-black/80 px-2 py-1 text-sm font-bold text-white">#{String(index + 1).padStart(2, "0")}</span>
           </a>
-          <div class="p-5">
-            <h2 class="text-4xl font-bold tracking-tight text-gray-900">
+          <div class="flex flex-1 flex-col p-5">
+            <h2 class="text-2xl font-bold tracking-tight text-gray-900">
               <a
                 href={`/${clase.slug}`}
                 class="hover:text-sky-500 transition"
@@ -69,7 +75,7 @@ import { CLASES } from "../consts"
                 {clase.title}
               </a>
             </h2>
-            <p class="mt-3 mb-4 font-light text-gray-800">
+            <p class="mt-3 mb-4 text-gray-600">
               {clase.description}
             </p>
             <ul class="inline-flex flex-wrap gap-2">
@@ -79,8 +85,8 @@ import { CLASES } from "../consts"
                 </li>
               ))}
             </ul>
-            <ul class="flex flex-wrap gap-2 mt-4">
-              <li>
+            <ul class="flex flex-wrap gap-2 mt-auto pt-6">
+              {clase.code && <li>
                 <a
                   href={clase.code}
                   target="_blank"
@@ -93,7 +99,7 @@ import { CLASES } from "../consts"
                   </svg>
                   Código
                 </a>
-              </li>
+              </li>}
               {clase.web && (
                 <li>
                   <a
@@ -133,7 +139,7 @@ import { CLASES } from "../consts"
     })
   }
   <article
-    class="min-h-60 relative items-center text-black rounded-lg bg-purple-50"
+    class="min-h-60 group flex h-full flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm transition hover:border-sky-300 hover:shadow-lg bg-purple-50"
   >
     <a
       href="https://twitch.tv/midudev"

@@ -1,11 +1,9 @@
 ---
-const response = await fetch(
-  "https://api.github.com/repos/midudev/aprendiendo-react"
-)
-
-const data = await response.json()
-
-const starCounter = data.stargazers_count ?? 0
+let starCounter = 0
+try {
+  const response = await fetch("https://api.github.com/repos/midudev/aprendiendo-react", { signal: AbortSignal.timeout(3000) })
+  if (response.ok) starCounter = (await response.json()).stargazers_count ?? 0
+} catch { /* El enlace sigue disponible si GitHub no responde. */ }
 
 function formatToK(num: number) {
   return num >= 1000 ? (num / 1000).toFixed(1) + "K" : num.toString()
@@ -40,11 +38,11 @@ function formatToK(num: number) {
       <div
         class="overflow-hidden flex flex-col h-8 items-center rounded-md bg-gray-100 px-4 font-medium text-xs justify-center group-hover:bg-yellow-200 transition w-40 relative"
       >
-        <span class="absolute group-hover:animate-fade-out-up"
-          >{`${formatToK(starCounter)} estrellas en GitHub`}</span
+        <span class="absolute group-hover:opacity-0"
+          >{starCounter ? `${formatToK(starCounter)} estrellas en GitHub` : "Ver en GitHub"}</span
         >
         <span
-          class="absolute opacity-0 group-hover:animate-fade-in-up"
+          class="absolute opacity-0 group-hover:opacity-100"
           >¡Dale una estrella!</span
         >
       </div>

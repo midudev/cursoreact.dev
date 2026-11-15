@@ -3,24 +3,24 @@ import ReactLogo from "./ReactLogo.astro"
 ---
 
 <header
-  class="flex justify-center flex-col max-w-xl mx-auto items-center pt-12"
+  class="flex justify-center flex-col max-w-xl mx-auto items-center"
 >
   <h1
-    class="font-bold items-center mb-8 mt-4 flex gap-4 animate-blurred-fade-in"
+    class="font-bold items-center  flex gap-4"
   >
     <span class="flex flex-col text-center gap-3 sm:gap-0">
       <span
-        class="tracking-tighter text-5xl px-1 bg-clip-text inline-block text-transparent bg-gradient-to-r from-slate-400 to-slate-600 sm:text-6xl"
+        class="tracking-tighter text-4xl px-1 bg-clip-text inline-block text-transparent bg-gradient-to-r from-slate-400 to-slate-600 sm:text-6xl"
         >Curso de
       </span>
       <span
-        class="tracking-tighter text-slate-800 text-[32px] sm:text-[70px] -mt-8"
+        class="tracking-tighter text-slate-800 text-[52px] sm:text-[70px] leading-none"
         >React.js</span
       >
     </span>
 
     <span>
-      <ReactLogo />
+      <ReactLogo className="w-24 h-24 sm:w-36 sm:h-36" />
     </span>
   </h1>
 </header>

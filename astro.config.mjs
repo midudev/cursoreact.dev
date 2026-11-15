@@ -7,6 +7,7 @@ import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
+  markdown: { shikiConfig: { theme: "github-dark-high-contrast" } },
   build: {
     inlineStylesheets: 'always'
   },

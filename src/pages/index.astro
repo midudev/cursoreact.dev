@@ -1,15 +1,21 @@
 ---
 import Layout from "../layouts/Layout.astro"
-import Header from "../components/Header.astro"
+import { CLASES } from "../consts"
 import Hero from "../components/Hero.astro"
 import Clases from "../components/Clases.astro"
 import Footer from "../components/Footer.astro"
 import GitHubStar from "../components/GitHubStar.astro"
 ---
 
-<Layout title="Curso de React.js práctico y gratuito por midudev">
+<Layout title="Curso de React gratis: 14 clases, proyectos y vídeos | midudev" jsonLd={{
+  "@context": "https://schema.org", "@type": "Course",
+  name: "Curso de React de midudev", description: "Aprende React desde cero con proyectos, vídeos y código gratis.",
+  url: "https://cursoreact.dev/", inLanguage: "es", isAccessibleForFree: true,
+  provider: { "@type": "Person", name: "Miguel Ángel Durán", url: "https://midu.dev" },
+  hasPart: CLASES.map(c => ({ "@type": "LearningResource", name: c.title, description: c.description, url: `https://cursoreact.dev/${c.slug}` }))
+}}>
   <div
-    class="pt-12 min-h-screen flex gap-y-20 flex-col justify-between px-8 relative"
+    class="pt-12 min-h-screen flex gap-y-16 flex-col justify-between px-8 relative"
   >
     <div
       class="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#f5f5f5,transparent_1px),linear-gradient(to_bottom,#f5f5f5,transparent_1px)] bg-[size:6rem_4rem]"
@@ -20,7 +26,6 @@ import GitHubStar from "../components/GitHubStar.astro"
       </div>
     </div>
     <GitHubStar />
-    <Header />
     <Hero />
     <Clases />
     <Footer />

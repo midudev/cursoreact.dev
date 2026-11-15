@@ -1,14 +1,14 @@
 ---
-import { ClientRouter } from "astro:transitions"
+
 
 interface Props {
   description?: string
   title: string
+  jsonLd?: Record<string, unknown>
 }
 
-const { title, description: originalDescription = "Con ejercicios practicos" } =
-  Astro.props
-const description = `Curso de React gratuito - ${originalDescription}`
+const { title, description = "Aprende React desde cero con 14 clases gratis de midudev: hooks, TypeScript, React 19, proyectos prácticos, vídeos y código fuente.", jsonLd } = Astro.props
+const canonical = new URL(Astro.url.pathname.replace(/\/+$/, "") || "/", Astro.site)
 ---
 
 <!doctype html>
@@ -23,7 +23,7 @@ const description = `Curso de React gratuito - ${originalDescription}`
       content="javascript, react, reactjs, midudev, js, programación, desarrollo web"
     />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="theme-color" content="#f7df1e" />
+    <meta name="theme-color" content="#58c4dc" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@midudev" />
     <meta name="twitter:title" content={title} />
@@ -33,11 +33,15 @@ const description = `Curso de React gratuito - ${originalDescription}`
     <meta property="og:description" content={description} />
     <meta property="og:image" content="https://cursoreact.dev/og.jpg" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://cursoreact.dev" />
-    <link rel="canonical" href="https://cursoreact.dev" />
+    <meta property="og:url" content={canonical} />
+    <link rel="canonical" href={canonical} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <ClientRouter />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Curso React de midudev" />
+    <meta property="og:image:alt" content="Curso de React gratis por midudev" />
+    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, "\\u003c")} />}
   </head>
   <body>
     <a
@@ -50,9 +54,12 @@ const description = `Curso de React gratuito - ${originalDescription}`
     </main>
     <style is:global>
       @import "tailwindcss";
-      @plugin "@midudev/tailwind-animations";
+
       @plugin "@tailwindcss/typography";
 
+      :focus-visible { outline: 3px solid #0284c7; outline-offset: 4px; }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+      .prose pre { background-color: #0a0c10; color: #f0f3f6; }
       html {
         font-family: system-ui, sans-serif;
       }
