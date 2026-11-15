@@ -17,7 +17,7 @@ const Content = module ? (await module() as { default: any }).default : null
 }}>
   <div class="mx-auto max-w-[1400px] px-5 py-8 sm:px-8">
     <nav aria-label="Ruta de navegación" class="mb-8 text-sm text-sky-800"><a href="/">← Todas las clases de React</a></nav>
-    <div class="grid items-start gap-8 xl:gap-12 lg:grid-cols-[minmax(0,1fr)_300px]">
+    <div class="grid items-start gap-8 xl:gap-12 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px]">
       <article class="min-w-0">
         <header class="lesson-heading">
           <p class="lesson-meta">Curso de React <span> / </span> Clase {String(index + 1).padStart(2, '0')} de {CLASES.length}</p>
@@ -32,7 +32,6 @@ const Content = module ? (await module() as { default: any }).default : null
           {info.web && <a class="resource" href={info.web} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18m-14-3h1m2 0h1"/></svg><span>Probar demo<small>Abre la aplicación en vivo</small></span><span aria-hidden="true">↗</span></a>}
           <a class="resource resource-youtube" href={`https://www.youtube.com/watch?v=${info.id}`} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.6 4.6 12 4.6 12 4.6s-5.6 0-7.5.5a3 3 0 0 0-2.1 2.1C2 9.1 2 12 2 12s0 2.9.4 4.8a3 3 0 0 0 2.1 2.1c1.9.5 7.5.5 7.5.5s5.6 0 7.5-.5a3 3 0 0 0 2.1-2.1c.4-1.9.4-4.8.4-4.8s0-2.9-.4-4.8ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg><span>Ver en YouTube<small>Comentarios y más vídeos</small></span><span aria-hidden="true">↗</span></a>
         </nav>
-        <div class="notes-heading"><span aria-hidden="true">≡</span> Apuntes de la clase</div>
         <div class="lesson-notes prose prose-slate max-w-none prose-a:text-sky-800">{Content ? <Content components={{ h1: "h2" }} /> : <p>{info.description}</p>}</div>
         <nav aria-label="Siguiente y anterior clase" class="my-10 flex justify-between gap-5 text-sm font-semibold text-sky-800">
           {index > 0 && <a href={`/${CLASES[index - 1].slug}`}>← Clase anterior</a>}
@@ -70,8 +69,6 @@ const Content = module ? (await module() as { default: any }).default : null
   .resource-code small { color: #cbd5e1; }
   .resource-code:hover { background: #1e293b; border-color: #1e293b; }
   .resource-youtube svg { color: #dc2626; }
-  .notes-heading { display: flex; align-items: center; gap: .6rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.25rem; font-size: .9rem; font-weight: 650; color: #475569; }
-  .notes-heading span { font-size: 1.4rem; color: #0369a1; }
   .lesson-notes { font-size: 1rem; line-height: 1.7; color: #334155; }
   .lesson-notes :global(p), .lesson-notes :global(ul), .lesson-notes :global(ol), .lesson-notes :global(blockquote) { max-width: 72ch; }
   .lesson-notes :global(p) { margin: .8rem 0; }
@@ -100,9 +97,11 @@ const Content = module ? (await module() as { default: any }).default : null
   .outline-text { min-width: 0; }
   .outline-number { display: block; margin-bottom: .15rem; font-size: .65rem; font-weight: 650; color: #64748b; font-variant-numeric: tabular-nums; }
   .is-current .outline-number { color: #0369a1; }
-  .outline-title { display: block; font-size: .76rem; line-height: 1.4; font-weight: 550; color: #334155; text-wrap: pretty; }
+  .outline-title { display: block; font-size: .82rem; line-height: 1.45; font-weight: 550; color: #334155; text-wrap: pretty; }
   .is-current .outline-title { color: #075985; font-weight: 700; }
   .outline-all { display: flex; justify-content: space-between; margin: 1rem .5rem 0; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #0369a1; font-size: .75rem; font-weight: 650; }
   .course-outline { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem .75rem; }
-  @media (min-width: 1024px) { .course-outline { position: sticky; top: 1.5rem; max-height: calc(100dvh - 3rem); overflow-y: auto; scrollbar-width: thin; } }
+  @media (min-width: 1024px) { .course-outline { position: sticky; top: 1.5rem; max-height: calc(100dvh - 3rem); overflow-y: auto; scrollbar-width: thin; scrollbar-color: transparent transparent; } }
+  .course-outline:hover, .course-outline:focus-within { scrollbar-color: #94a3b8 transparent; }
+  @media (hover: none) { .course-outline { scrollbar-width: none; } }
 </style>
