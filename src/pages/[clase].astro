@@ -33,15 +33,19 @@ const Content = module ? (await module() as { default: any }).default : null
           <a class="resource resource-youtube" href={`https://www.youtube.com/watch?v=${info.id}`} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.6 4.6 12 4.6 12 4.6s-5.6 0-7.5.5a3 3 0 0 0-2.1 2.1C2 9.1 2 12 2 12s0 2.9.4 4.8a3 3 0 0 0 2.1 2.1c1.9.5 7.5.5 7.5.5s5.6 0 7.5-.5a3 3 0 0 0 2.1-2.1c.4-1.9.4-4.8.4-4.8s0-2.9-.4-4.8ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg><span>Ver en YouTube<small>Comentarios y más vídeos</small></span><span aria-hidden="true">↗</span></a>
         </nav>
         <div class="notes-heading"><span aria-hidden="true">≡</span> Apuntes de la clase</div>
-        <div class="prose prose-slate max-w-none prose-a:text-sky-800">{Content ? <Content components={{ h1: "h2" }} /> : <p>{info.description}</p>}</div>
+        <div class="lesson-notes prose prose-slate max-w-none prose-a:text-sky-800">{Content ? <Content components={{ h1: "h2" }} /> : <p>{info.description}</p>}</div>
         <nav aria-label="Siguiente y anterior clase" class="my-10 flex justify-between gap-5 text-sm font-semibold text-sky-800">
           {index > 0 && <a href={`/${CLASES[index - 1].slug}`}>← Clase anterior</a>}
           {index < CLASES.length - 1 && <a href={`/${CLASES[index + 1].slug}`}>Siguiente clase →</a>}
         </nav>
       </article>
       <aside class="course-outline">
-        <h2 class="mb-1 text-lg font-bold">Contenido del curso</h2>
-        <p class="mb-5 text-sm text-slate-500">14 clases · A tu ritmo · Gratis</p><nav aria-label="Temario"><ol class="space-y-1">{CLASES.map((c, i) => <li><a href={`/${c.slug}`} aria-current={c.slug === info.slug ? 'page' : undefined} class:list={["block rounded-lg px-3 py-2.5 text-sm hover:bg-sky-100", c.slug === info.slug ? 'bg-sky-100 font-semibold text-sky-900' : 'text-slate-700']}>{String(i + 1).padStart(2, '0')}. {c.title}</a></li>)}</ol></nav>
+        <div class="outline-heading"><img src="/icons/react.svg" alt="" width="28" height="28" /><div><h2>Tu ruta de React</h2><p>14 clases para aprender creando</p></div></div>
+        <nav aria-label="Temario"><ol class="outline-list">{CLASES.map((c, i) => <li><a href={`/${c.slug}`} aria-current={c.slug === info.slug ? 'page' : undefined} class:list={["outline-lesson", { "is-current": c.slug === info.slug }]}>
+          <span class="outline-thumbnail"><img src={`/${i + 1}.webp`} alt="" width="128" height="72" loading="lazy" decoding="async" />{c.slug === info.slug && <span class="outline-playing" aria-hidden="true">▶</span>}</span>
+          <span class="outline-text"><span class="outline-number">{String(i + 1).padStart(2, '0')} {c.slug === info.slug && <span>· Viendo ahora</span>}</span><span class="outline-title">{c.title}</span></span>
+        </a></li>)}</ol></nav>
+        <a class="outline-all" href="/">Explorar todas las clases <span aria-hidden="true">↗</span></a>
       </aside>
     </div>
     <Footer />
@@ -66,8 +70,39 @@ const Content = module ? (await module() as { default: any }).default : null
   .resource-code small { color: #cbd5e1; }
   .resource-code:hover { background: #1e293b; border-color: #1e293b; }
   .resource-youtube svg { color: #dc2626; }
-  .notes-heading { display: flex; align-items: center; gap: .6rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 2rem; font-size: .9rem; font-weight: 650; color: #475569; }
+  .notes-heading { display: flex; align-items: center; gap: .6rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.25rem; font-size: .9rem; font-weight: 650; color: #475569; }
   .notes-heading span { font-size: 1.4rem; color: #0369a1; }
-  .course-outline { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; }
+  .lesson-notes { font-size: 1rem; line-height: 1.7; color: #334155; }
+  .lesson-notes :global(p), .lesson-notes :global(ul), .lesson-notes :global(ol), .lesson-notes :global(blockquote) { max-width: 72ch; }
+  .lesson-notes :global(p) { margin: .8rem 0; }
+  .lesson-notes :global(h2) { margin: 1.75rem 0 .65rem; font-size: clamp(1.35rem, 2vw, 1.65rem); line-height: 1.3; letter-spacing: -.025em; font-weight: 700; text-wrap: balance; }
+  .lesson-notes :global(h3) { margin: 1.4rem 0 .5rem; font-size: 1.15rem; line-height: 1.4; }
+  .lesson-notes :global(ul), .lesson-notes :global(ol) { margin: .75rem 0 1rem; padding-left: 1.4rem; }
+  .lesson-notes :global(li) { margin: .4rem 0; padding-left: .15rem; }
+  .lesson-notes :global(li p) { margin: .4rem 0; }
+  .lesson-notes :global(li::marker) { color: #64748b; }
+  .lesson-notes :global(hr) { margin: 1.5rem 0; border-color: #e2e8f0; }
+  .lesson-notes :global(hr + h2) { margin-top: 0; }
+  .lesson-notes :global(> :first-child) { margin-top: 0; }
+  .lesson-notes :global(.code-block) { margin: 1.25rem 0; }
+  .lesson-notes :global(pre) { font-size: .85rem; line-height: 1.65; }
+  .outline-heading { display: flex; align-items: center; gap: .7rem; padding: .25rem .25rem 1rem; }
+  .outline-heading > img { filter: invert(65%) sepia(80%) saturate(600%) hue-rotate(150deg); }
+  .outline-heading h2 { font-size: 1rem; font-weight: 750; letter-spacing: -.02em; color: #0f172a; }
+  .outline-heading p { margin-top: .2rem; font-size: .7rem; color: #64748b; }
+  .outline-list { display: flex; flex-direction: column; gap: .3rem; }
+  .outline-lesson { display: flex; align-items: center; gap: .65rem; padding: .65rem .5rem; border: 1px solid transparent; border-radius: 9px; transition: background .15s; }
+  .outline-lesson:hover { background: #eaf2f8; }
+  .outline-lesson.is-current { background: #e0f2fe; border-color: #bae6fd; }
+  .outline-thumbnail { flex: 0 0 58px; position: relative; overflow: hidden; border-radius: 5px; background: #0f172a; }
+  .outline-thumbnail img { width: 58px; height: 38px; object-fit: cover; }
+  .outline-playing { position: absolute; inset: 0; display: grid; place-items: center; background: #0c4a6e88; color: white; font-size: .8rem; }
+  .outline-text { min-width: 0; }
+  .outline-number { display: block; margin-bottom: .15rem; font-size: .65rem; font-weight: 650; color: #64748b; font-variant-numeric: tabular-nums; }
+  .is-current .outline-number { color: #0369a1; }
+  .outline-title { display: block; font-size: .76rem; line-height: 1.4; font-weight: 550; color: #334155; text-wrap: pretty; }
+  .is-current .outline-title { color: #075985; font-weight: 700; }
+  .outline-all { display: flex; justify-content: space-between; margin: 1rem .5rem 0; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #0369a1; font-size: .75rem; font-weight: 650; }
+  .course-outline { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem .75rem; }
   @media (min-width: 1024px) { .course-outline { position: sticky; top: 1.5rem; max-height: calc(100dvh - 3rem); overflow-y: auto; scrollbar-width: thin; } }
 </style>
