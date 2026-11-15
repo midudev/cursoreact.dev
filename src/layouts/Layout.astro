@@ -59,6 +59,10 @@ const canonical = new URL(Astro.url.pathname.replace(/\/+$/, "") || "/", Astro.s
 
       :focus-visible { outline: 3px solid #0284c7; outline-offset: 4px; }
       @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+      .code-block { margin: 1.75rem 0; overflow: hidden; border-radius: 12px; background: #10141c; border: 1px solid #293244; }
+      .code-block-heading { display: flex; align-items: center; gap: .6rem; padding: .7rem 1rem; border-bottom: 1px solid #293244; background: #19202c; color: #e1e9f7; font: 600 .75rem/1.5 system-ui, sans-serif; }
+      .code-technology-icon { display: inline-block; width: 20px; height: 20px; background: var(--technology-color); mask: var(--technology-icon) center / contain no-repeat; }
+      .prose .code-block pre { margin: 0; border-radius: 0; padding: 1.25rem; }
       .prose pre { background-color: #10141c; color: #f1f5ff; }
       html {
         font-family: system-ui, sans-serif;

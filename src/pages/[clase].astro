@@ -15,46 +15,59 @@ const Content = module ? (await module() as { default: any }).default : null
     { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Curso React", item: "https://cursoreact.dev/" }, { "@type": "ListItem", position: 2, name: info.title, item: `https://cursoreact.dev/${info.slug}` }] }
   ]
 }}>
-  <div class="mx-auto max-w-6xl px-5 py-8 sm:px-8">
+  <div class="mx-auto max-w-[1400px] px-5 py-8 sm:px-8">
     <nav aria-label="Ruta de navegación" class="mb-8 text-sm text-sky-800"><a href="/">← Todas las clases de React</a></nav>
-    <div class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
+    <div class="grid items-start gap-8 xl:gap-12 lg:grid-cols-[minmax(0,1fr)_300px]">
       <article class="min-w-0">
-        <button type="button" data-video={info.id} class="video group relative block w-full overflow-hidden rounded-2xl bg-slate-900 text-white" aria-label={`Reproducir clase: ${info.title}`}>
-          <img src={`/${index + 1}.webp`} alt="" width="1280" height="720" fetchpriority="high" class="aspect-video w-full object-cover" />
-          <span class="absolute inset-0 flex items-center justify-center bg-black/20"><span class="rounded-xl bg-sky-800 px-6 py-3 font-semibold group-hover:bg-sky-900">▶ Ver clase</span></span>
-        </button>
-        <p class="mt-7 text-sm font-semibold text-sky-800">Clase {String(index + 1).padStart(2, '0')}</p>
-        <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{info.title}</h1>
-        <ul class="my-5 flex flex-wrap gap-2">{info.learnings.map((l: string) => <li class="rounded-md bg-sky-50 px-2 py-1 text-sm text-sky-900">{l}</li>)}</ul>
-        <div class="mb-8 flex flex-wrap gap-3 font-semibold text-sky-800">
-          {info.code && <a href={info.code} target="_blank" rel="noopener noreferrer">Código fuente</a>}
-          {info.web && <a href={info.web} target="_blank" rel="noopener noreferrer">Ver demo</a>}
-          <a href={`https://www.youtube.com/watch?v=${info.id}`} target="_blank" rel="noopener noreferrer">Ver en YouTube</a>
+        <header class="lesson-heading">
+          <p class="lesson-meta">Curso de React <span> / </span> Clase {String(index + 1).padStart(2, '0')} de {CLASES.length}</p>
+          <h1>{info.title}</h1>
+          <ul class="lesson-tags">{info.learnings.map((l: string) => <li>{l}</li>)}</ul>
+        </header>
+        <div class="player">
+          <iframe src={`https://www.youtube-nocookie.com/embed/${info.id}?autoplay=1&mute=1&playsinline=1&rel=0`} title={`Clase ${index + 1}: ${info.title}`} width="1280" height="720" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
         </div>
+        <nav class="lesson-resources" aria-label="Recursos de la clase">
+          {info.code && <a class="resource resource-code" href={info.code} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 4l-4 16" /></svg><span>Código fuente<small>Explora el proyecto en GitHub</small></span><span aria-hidden="true">↗</span></a>}
+          {info.web && <a class="resource" href={info.web} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18m-14-3h1m2 0h1"/></svg><span>Probar demo<small>Abre la aplicación en vivo</small></span><span aria-hidden="true">↗</span></a>}
+          <a class="resource resource-youtube" href={`https://www.youtube.com/watch?v=${info.id}`} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.6 4.6 12 4.6 12 4.6s-5.6 0-7.5.5a3 3 0 0 0-2.1 2.1C2 9.1 2 12 2 12s0 2.9.4 4.8a3 3 0 0 0 2.1 2.1c1.9.5 7.5.5 7.5.5s5.6 0 7.5-.5a3 3 0 0 0 2.1-2.1c.4-1.9.4-4.8.4-4.8s0-2.9-.4-4.8ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg><span>Ver en YouTube<small>Comentarios y más vídeos</small></span><span aria-hidden="true">↗</span></a>
+        </nav>
+        <div class="notes-heading"><span aria-hidden="true">≡</span> Apuntes de la clase</div>
         <div class="prose prose-slate max-w-none prose-a:text-sky-800">{Content ? <Content components={{ h1: "h2" }} /> : <p>{info.description}</p>}</div>
         <nav aria-label="Siguiente y anterior clase" class="my-10 flex justify-between gap-5 text-sm font-semibold text-sky-800">
           {index > 0 && <a href={`/${CLASES[index - 1].slug}`}>← Clase anterior</a>}
           {index < CLASES.length - 1 && <a href={`/${CLASES[index + 1].slug}`}>Siguiente clase →</a>}
         </nav>
       </article>
-      <aside class="rounded-2xl border border-slate-200 bg-slate-50 p-5 lg:sticky lg:top-6">
-        <h2 class="mb-4 text-xl font-bold">Curso de React</h2>
-        <nav aria-label="Temario"><ol class="space-y-1">{CLASES.map((c, i) => <li><a href={`/${c.slug}`} aria-current={c.slug === info.slug ? 'page' : undefined} class:list={["block rounded-lg px-3 py-2 text-sm hover:bg-sky-100", c.slug === info.slug ? 'bg-sky-100 font-semibold text-sky-900' : 'text-slate-700']}>{String(i + 1).padStart(2, '0')}. {c.title}</a></li>)}</ol></nav>
+      <aside class="course-outline">
+        <h2 class="mb-1 text-lg font-bold">Contenido del curso</h2>
+        <p class="mb-5 text-sm text-slate-500">14 clases · A tu ritmo · Gratis</p><nav aria-label="Temario"><ol class="space-y-1">{CLASES.map((c, i) => <li><a href={`/${c.slug}`} aria-current={c.slug === info.slug ? 'page' : undefined} class:list={["block rounded-lg px-3 py-2.5 text-sm hover:bg-sky-100", c.slug === info.slug ? 'bg-sky-100 font-semibold text-sky-900' : 'text-slate-700']}>{String(i + 1).padStart(2, '0')}. {c.title}</a></li>)}</ol></nav>
       </aside>
     </div>
     <Footer />
   </div>
 </Layout>
-<script>
-  document.querySelectorAll<HTMLButtonElement>('[data-video]').forEach(button => {
-    button.addEventListener('click', () => {
-      const frame = document.createElement('iframe')
-      frame.src = `https://www.youtube-nocookie.com/embed/${button.dataset.video}?autoplay=1`
-      frame.title = button.getAttribute('aria-label') || 'Clase de React'
-      frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'
-      frame.allowFullscreen = true
-      frame.className = 'aspect-video w-full rounded-2xl border-0'
-      button.replaceWith(frame)
-    }, { once: true })
-  })
-</script>
+<style>
+  .lesson-heading { margin-bottom: 1.75rem; }
+  .lesson-meta { color: #0369a1; font-size: .8rem; font-weight: 650; margin-bottom: .75rem; }
+  .lesson-meta span { color: #94a3b8; margin: 0 .5rem; }
+  h1 { font-size: clamp(1.8rem, 3vw, 2.75rem); line-height: 1.12; letter-spacing: -.04em; font-weight: 750; color: #0f172a; max-width: 25ch; text-wrap: balance; }
+  .lesson-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+  .lesson-tags li { background: #f0f9ff; color: #075985; border: 1px solid #e0f2fe; padding: .2rem .6rem; border-radius: 6px; font-size: .75rem; font-weight: 550; }
+  .player { overflow: hidden; border-radius: 16px; background: #10141c; box-shadow: 0 10px 32px -16px #0f172a55; }
+  .player iframe { display: block; width: 100%; height: auto; aspect-ratio: 16/9; border: 0; }
+  .lesson-resources { display: flex; flex-wrap: wrap; gap: .65rem; margin: 1.25rem 0 3rem; }
+  .resource { flex: 1 1 200px; display: flex; align-items: center; gap: .75rem; border: 1px solid #cbd5e1; border-radius: 10px; padding: .9rem 1rem; color: #0f172a; background: white; font-size: .85rem; font-weight: 650; transition: background .15s, border-color .15s; }
+  .resource:hover { background: #f0f9ff; border-color: #0284c7; }
+  .resource svg { width: 24px; height: 24px; flex-shrink: 0; }
+  .resource > span:last-child { margin-left: auto; }
+  .resource small { display: block; font-size: .68rem; font-weight: 450; color: #475569; margin-top: .2rem; }
+  .resource-code { background: #0f172a; color: white; border-color: #0f172a; }
+  .resource-code small { color: #cbd5e1; }
+  .resource-code:hover { background: #1e293b; border-color: #1e293b; }
+  .resource-youtube svg { color: #dc2626; }
+  .notes-heading { display: flex; align-items: center; gap: .6rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 2rem; font-size: .9rem; font-weight: 650; color: #475569; }
+  .notes-heading span { font-size: 1.4rem; color: #0369a1; }
+  .course-outline { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; }
+  @media (min-width: 1024px) { .course-outline { position: sticky; top: 1.5rem; max-height: calc(100dvh - 3rem); overflow-y: auto; scrollbar-width: thin; } }
+</style>
